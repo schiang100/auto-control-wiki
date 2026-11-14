@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Automatic Control (I) LLM Wiki — 自動控制數位知識庫與互動實驗室</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    body {
+      font-family: 'Inter', 'Noto Sans TC', sans-serif;
+      background-color: #0b0f19;
+      color: #e2e8f0;
+    }
+    code, pre {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .wiki-prose h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #f8fafc;
+      margin-bottom: 1rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 1px solid #1e293b;
+    }
+    .wiki-prose h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #38bdf8;
+      margin-top: 1.75rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .wiki-prose h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #a5b4fc;
+      margin-top: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+    .wiki-prose h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fcd34d;
+      margin-top: 1rem;
+      margin-bottom: 0.4rem;
+    }
+    .wiki-prose p {
+      line-height: 1.75;
+      color: #cbd5e1;
+      margin-bottom: 0.9rem;
+    }
+    .wiki-prose ul, .wiki-prose ol {
+      margin-left: 1.4rem;
+      margin-bottom: 1rem;
+      color: #cbd5e1;
+      line-height: 1.7;
+    }
+    .wiki-prose ul { list-style-type: disc; }
+    .wiki-prose ol { list-style-type: decimal; }
+    .wiki-prose li { margin-bottom: 0.35rem; }
+    .wiki-prose blockquote {
+      border-left: 4px solid #6366f1;
+      background: rgba(99, 102, 241, 0.1);
+      padding: 0.85rem 1.1rem;
+      border-radius: 0 0.5rem 0.5rem 0;
+      margin-bottom: 1.25rem;
+      color: #e0e7ff;
+    }
+    .wiki-prose table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.1rem 0;
+      font-size: 0.9rem;
+      background: #0f172a;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      border: 1px solid #1e293b;
+    }
+    .wiki-prose th {
+      background: #1e293b;
+      color: #f8fafc;
+      font-weight: 600;
+      text-align: left;
+      padding: 0.65rem 0.85rem;
+      border-bottom: 1px solid #334155;
+    }
+    .wiki-prose td {
+      padding: 0.6rem 0.85rem;
+      border-bottom: 1px solid #1e293b;
+      color: #cbd5e1;
+    }
+    .wiki-prose tr:hover td {
+      background: rgba(30, 41, 59, 0.5);
+    }
+    .wiki-prose pre {
+      background: #090d16;
+      border: 1px solid #1e293b;
+      padding: 0.9rem 1rem;
+      border-radius: 0.5rem;
+      overflow-x: auto;
+      margin-bottom: 1rem;
+      color: #e2e8f0;
+      font-size: 0.85rem;
+    }
+    .wiki-prose code {
+      background: rgba(51, 65, 85, 0.55);
+      color: #7dd3fc;
+      padding: 0.15rem 0.35rem;
+      border-radius: 0.25rem;
+      font-size: 0.875em;
+    }
+    .wiki-prose pre code {
+      background: transparent;
+      padding: 0;
+      color: inherit;
+    }
+    .wikilink-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.1rem 0.5rem;
+      border-radius: 0.375rem;
+      background: rgba(79, 70, 229, 0.2);
+      border: 1px solid rgba(99, 102, 241, 0.45);
+      color: #a5b4fc;
+      font-weight: 500;
+      font-size: 0.9em;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-decoration: none;
+    }
+    .wikilink-chip:hover {
+      background: rgba(79, 70, 229, 0.4);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+    .katex-display {
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 0.5rem 0;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-[#0b0f19] text-slate-100 selection:bg-indigo-500 selection:text-white">
+
+  <!-- Top Header & Navigation -->
+  <header class="sticky top-0 z-30 border-b border-slate-800/80 bg-[#0b0f19]/90 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-cyan-500 to-emerald-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 font-bold text-white text-lg">
+          AC
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-base sm:text-lg tracking-tight text-white">Automatic Control (I) — LLM Wiki</span>
+            <span class="hidden sm:inline-block text-xs px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-medium">AGENTS.md 驅動</span>
+          </div>
+          <p class="text-xs text-slate-400">國立中正大學機械系 陳世樂教授講義知識庫 ｜ 機械四 廖紹強 (412422092)</p>
+        </div>
+      </div>
+
+      <!-- Main Navigation Tabs -->
+      <nav class="flex items-center gap-1.5 bg-slate-900/90 p-1 rounded-xl border border-slate-800" aria-label="主要功能選單">
+        <button id="tab-btn-wiki" data-tab="wiki" class="main-tab-btn px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all bg-indigo-600 text-white shadow">
+          📚 知識庫閱讀器
+        </button>
+        <button id="tab-btn-graph" data-tab="graph" class="main-tab-btn px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-300 hover:text-white hover:bg-slate-800">
+          🕸️ 知識關聯圖譜
+        </button>
+        <button id="tab-btn-lab" data-tab="lab" class="main-tab-btn px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-300 hover:text-white hover:bg-slate-800">
+          🎛️ 控制互動實驗室
+        </button>
+        <button id="tab-btn-schema" data-tab="schema" class="main-tab-btn px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-300 hover:text-white hover:bg-slate-800">
+          🤖 AGENTS.md 與繳交區
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Architecture Banner -->
+  <div class="bg-gradient-to-r from-indigo-950/60 via-slate-900 to-cyan-950/60 border-b border-slate-800/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-300">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono">Layer 1: raw/</span>
+        <span>47頁原始講義 PDF (唯讀)</span>
+        <span class="text-slate-600">→</span>
+        <span class="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-mono">Layer 2: wiki/</span>
+        <span>7篇完整章節 + 7張概念卡 + index.md + log.md</span>
+        <span class="text-slate-600">→</span>
+        <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono">Layer 3: Schema</span>
+        <span>AGENTS.md / CLAUDE.md 規則引擎</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span id="stat-badge" class="text-slate-400 font-mono">14 篇雙向連結筆記 · 38 組關聯邊 · 0 孤兒節點</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-5">
+
+    <!-- ==================== VIEW 1: WIKI READER ==================== -->
+    <section id="view-wiki" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <!-- Left Sidebar: Catalog & Search -->
+      <aside class="lg:col-span-3 flex flex-col gap-4">
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-lg">
+          <label for="wiki-search" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+            🔍 檢索 Wiki 知識庫 (qmd / Index)
+          </label>
+          <input id="wiki-search" type="text" placeholder="搜尋極點、Routh、Bode、超越量..." class="w-full px-3 py-2 text-sm rounded-xl bg-slate-950 border border-slate-700 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500" />
+          
+          <!-- Category Filter Buttons -->
+          <div class="grid grid-cols-3 gap-1.5 mt-3">
+            <button id="filter-all" data-filter="all" class="wiki-filter-btn px-2 py-1.5 rounded-lg text-xs font-medium bg-indigo-600 text-white">全部 (14)</button>
+            <button id="filter-chapter" data-filter="chapter" class="wiki-filter-btn px-2 py-1.5 rounded-lg text-xs font-medium bg-slate-800 text-slate-300 hover:bg-slate-700">章節 (7)</button>
+            <button id="filter-concept" data-filter="concept" class="wiki-filter-btn px-2 py-1.5 rounded-lg text-xs font-medium bg-slate-800 text-slate-300 hover:bg-slate-700">概念卡 (7)</button>
+          </div>
+        </div>
+
+        <!-- Page List -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 shadow-lg flex-1 max-h-[70vh] overflow-y-auto" id="wiki-sidebar-list">
+          <!-- Populated dynamically -->
+        </div>
+      </aside>
+
+      <!-- Center: Wiki Article Content -->
+      <article class="lg:col-span-6 bg-slate-900/90 border border-slate-800 rounded-2xl p-5 sm:p-7 shadow-xl">
+        <!-- Metadata Frontmatter Bar -->
+        <div id="article-meta" class="mb-5 pb-4 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- Rendered Markdown Body -->
+        <div id="article-body" class="wiki-prose">
+          <!-- Populated dynamically -->
+        </div>
+      </article>
+
+      <!-- Right Sidebar: Backlinks, Graph Mini-Inspector & Quick Actions -->
+      <aside class="lg:col-span-3 flex flex-col gap-4">
+        <!-- YAML Frontmatter Card -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-lg">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-xs font-semibold uppercase tracking-wider text-indigo-400">📄 YAML Frontmatter 屬性</h3>
+            <span id="meta-path-badge" class="text-[11px] font-mono text-slate-400"></span>
+          </div>
+          <div id="yaml-inspector" class="text-xs font-mono bg-slate-950 p-3 rounded-xl border border-slate-800/90 text-slate-300 space-y-1 overflow-x-auto">
+          </div>
+        </div>
+
+        <!-- Bi-directional Links (Outbound & Inbound) -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-lg">
+          <h3 class="text-xs font-semibold uppercase tracking-wider text-cyan-400 mb-3">🔗 雙向關聯節點 (Cross-Links)</h3>
+          <div class="space-y-3">
+            <div>
+              <p class="text-[11px] text-slate-400 mb-1.5">👉 本頁引用之知識頁 (Outbound Links)：</p>
+              <div id="outbound-links" class="flex flex-col gap-1.5"></div>
+            </div>
+            <div class="pt-2 border-t border-slate-800">
+              <p class="text-[11px] text-slate-400 mb-1.5">👈 引用本頁之知識頁 (Inbound Backlinks)：</p>
+              <div id="inbound-links" class="flex flex-col gap-1.5"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Interactive Tool Launcher -->
+        <div class="bg-gradient-to-br from-indigo-950/80 to-slate-900 border border-indigo-500/30 rounded-2xl p-4 shadow-lg">
+          <h3 class="text-xs font-semibold uppercase tracking-wider text-indigo-300 mb-2">⚡ 互動模擬與圖譜連動</h3>
+          <p class="text-xs text-slate-300 mb-3 leading-relaxed">在閱讀理論公式時，可一鍵切換至對應的視覺化圖譜或動態模擬器驗證物理直覺：</p>
+          <div class="flex flex-col gap-2">
+            <button id="btn-jump-graph" class="w-full py-2 px-3 rounded-xl bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/40 text-xs font-medium text-indigo-200 transition flex items-center justify-between">
+              <span>🕸️ 在知識圖譜中定位本節點</span>
+              <span>→</span>
+            </button>
+            <button id="btn-jump-lab" class="w-full py-2 px-3 rounded-xl bg-cyan-600/30 hover:bg-cyan-600/50 border border-cyan-500/40 text-xs font-medium text-cyan-200 transition flex items-center justify-between">
+              <span>🎛️ 開啟自動控制互動模擬器</span>
+              <span>→</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- ==================== VIEW 2: OBSIDIAN KNOWLEDGE GRAPH ==================== -->
+    <section id="view-graph" class="hidden space-y-5">
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <div>
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+              🕸️ 自動控制 (I) LLM Wiki 雙向知識圖譜 (Obsidian Graph View)
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">
+              呈現 `wiki/chapters/`（7 大章節，靛藍色節點）與 `wiki/concepts/`（7 張跨章節概念卡，青色節點）之間的交叉引用網路。點擊任一節點可檢視摘要並直接開啟筆記。
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="graph-reset-btn" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 border border-slate-700">
+              🔄 重置圖譜視角
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+          <!-- Interactive SVG Graph Canvas -->
+          <div class="lg:col-span-8 bg-[#070a12] border border-slate-800 rounded-2xl overflow-hidden relative h-[520px]">
+            <svg id="wiki-graph-svg" viewBox="0 0 800 520" class="w-full h-full select-none"></svg>
+            <div class="absolute bottom-3 left-3 flex items-center gap-4 bg-slate-900/90 border border-slate-800 px-3 py-1.5 rounded-lg text-xs">
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-indigo-500 inline-block"></span> 章節筆記 (Chapters)</span>
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-cyan-400 inline-block"></span> 核心概念卡 (Concepts)</span>
+              <span class="flex items-center gap-1.5"><span class="w-3 h-0.5 bg-amber-400 inline-block"></span> 雙向連結 (Wiki Links)</span>
+            </div>
+          </div>
+
+          <!-- Selected Node Inspector -->
+          <div class="lg:col-span-4 bg-slate-950 border border-slate-800 rounded-2xl p-5 space-y-4">
+            <div class="flex items-center justify-between">
+              <span id="graph-node-badge" class="text-xs font-mono px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Chapter 3</span>
+              <span id="graph-node-pages" class="text-xs font-mono text-amber-400">pp. 9–20</span>
+            </div>
+            <h3 id="graph-node-title" class="text-base font-bold text-white leading-snug"></h3>
+            <p id="graph-node-tags" class="text-xs text-slate-400"></p>
+            <div class="border-t border-slate-800 pt-3">
+              <p class="text-xs font-semibold text-slate-300 mb-2">已連結之相鄰知識節點：</p>
+              <div id="graph-node-links" class="flex flex-wrap gap-1.5"></div>
+            </div>
+            <button id="graph-open-page-btn" class="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs transition shadow-lg shadow-indigo-600/25">
+              📖 在閱讀器中開啟此篇完整筆記
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 3: INTERACTIVE CONTROL LAB ==================== -->
+    <section id="view-lab" class="hidden space-y-6">
+      <!-- Sub-navigation for Lab Tools -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 class="text-base sm:text-lg font-bold text-white">🎛️ 自動控制 (I) 互動模擬實驗室 (Interactive Control Lab)</h2>
+          <p class="text-xs text-slate-400">將陳世樂教授講義 Ch.3 暫態響應、Ch.4 羅斯穩定表與 Ch.7 波德圖公式轉化為即時互動模擬</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button id="lab-sub-step" data-lab="step" class="lab-tab-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-600 text-white">
+            📈 Ch.3 二階步階響應與極點模擬
+          </button>
+          <button id="lab-sub-routh" data-lab="routh" class="lab-tab-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">
+            🧮 Ch.4 Routh-Hurwitz 穩定度計算機
+          </button>
+          <button id="lab-sub-bode" data-lab="bode" class="lab-tab-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">
+            📊 Ch.7 波德圖與穩定邊限模擬器
+          </button>
+        </div>
+      </div>
+
+      <!-- LAB 1: 2nd-Order Step Response & s-Plane Pole Map -->
+      <div id="lab-panel-step" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Controls -->
+        <div class="lg:col-span-4 bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-5">
+          <div>
+            <h3 class="text-sm font-bold text-indigo-300 mb-1">標準二階系統與零點效應參數設定</h3>
+            <p class="text-xs text-slate-400">對應講義 pp. 12–20：調整阻尼比 $\\zeta$、自然頻率 $\\omega_n$ 與附加零點 $z$</p>
+          </div>
+
+          <!-- Presets from Lecture Notes -->
+          <div>
+            <p class="text-xs font-medium text-slate-300 mb-2">📌 講義經典範例快速載入：</p>
+            <div class="grid grid-cols-2 gap-1.5">
+              <button data-zeta="0.28" data-wn="2.04" data-zero="0" class="step-preset-btn px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-indigo-600/40 border border-slate-700 text-xs text-left">
+                p.16 習題 ($\zeta=0.28, \omega_n=2.04$)
+              </button>
+              <button data-zeta="0" data-wn="4.0" data-zero="0" class="step-preset-btn px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-indigo-600/40 border border-slate-700 text-xs text-left">
+                p.12 無阻尼振盪 ($\zeta=0$)
+              </button>
+              <button data-zeta="1.0" data-wn="4.0" data-zero="0" class="step-preset-btn px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-indigo-600/40 border border-slate-700 text-xs text-left">
+                p.12 臨界阻尼 ($\zeta=1.0$)
+              </button>
+              <button data-zeta="1.5" data-wn="4.0" data-zero="0" class="step-preset-btn px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-indigo-600/40 border border-slate-700 text-xs text-left">
+                p.13 過阻尼 ($\zeta=1.5$)
+              </button>
+              <button data-zeta="0.1" data-wn="5.0" data-zero="5" class="step-preset-btn px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-indigo-600/40 border border-slate-700 text-xs text-left">
+                p.20 (c) LHP零點高超越 ($z=5$)
+              </button>
+              <button data-zeta="0.1" data-wn="5.0" data-zero="-5" class="step-preset-btn px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-indigo-600/40 border border-slate-700 text-xs text-left">
+                p.20 (d) RHP零點下衝 ($z=-5$)
+              </button>
+            </div>
+          </div>
+
+          <!-- Sliders -->
+          <div class="space-y-4 pt-2 border-t border-slate-800">
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <label for="slider-zeta" class="text-slate-300 font-medium">阻尼比 $\zeta$ (Damping Ratio)</label>
+                <span id="val-zeta" class="font-mono text-cyan-400 font-bold">0.28</span>
+              </div>
+              <input id="slider-zeta" type="range" min="0" max="2.0" step="0.02" value="0.28" class="w-full accent-indigo-500" />
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <label for="slider-wn" class="text-slate-300 font-medium">自然頻率 $\omega_n$ (rad/s)</label>
+                <span id="val-wn" class="font-mono text-cyan-400 font-bold">2.04</span>
+              </div>
+              <input id="slider-wn" type="range" min="0.5" max="8.0" step="0.02" value="2.04" class="w-full accent-indigo-500" />
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <label for="select-zero" class="text-slate-300 font-medium">附加零點效應 (Eq. 3-27, pp. 17–20)</label>
+              </div>
+              <select id="select-zero" class="w-full px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-slate-200">
+                <option value="0">無附加零點（標準二階系統 Eq. 3-20）</option>
+                <option value="10">LHP 遠處零點 s = -10 (z = 10)</option>
+                <option value="5">LHP 靠近零點 s = -5 (z = 5，超越量劇增)</option>
+                <option value="3">LHP 極近零點 s = -3 (z = 3，Fig. 3-10)</option>
+                <option value="-5">RHP 右半平面零點 s = +5 (z = -5，非最小相位下衝 Undershoot)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Computed Metrics Readout -->
+          <div class="bg-slate-950 border border-slate-800 rounded-xl p-3.5 space-y-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-slate-400">阻尼型態分類：</span>
+              <span id="metric-damping-type" class="font-bold text-emerald-400">欠阻尼 (Under-damped)</span>
+            </div>
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-slate-400">閉迴路極點 $s_{1,2}$：</span>
+              <span id="metric-poles" class="font-mono text-amber-300">-0.57 ± j1.96</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800/80 text-xs">
+              <div class="bg-slate-900 p-2 rounded-lg">
+                <div class="text-slate-400 text-[11px]">最大超越量 %OS</div>
+                <div id="metric-os" class="font-mono text-sm font-bold text-rose-400">40.0%</div>
+              </div>
+              <div class="bg-slate-900 p-2 rounded-lg">
+                <div class="text-slate-400 text-[11px]">峰值時間 $T_p$ (Eq.3-26)</div>
+                <div id="metric-tp" class="font-mono text-sm font-bold text-cyan-400">1.60 s</div>
+              </div>
+              <div class="bg-slate-900 p-2 rounded-lg">
+                <div class="text-slate-400 text-[11px]">2% 安定時間 $T_s$ (Eq.3-24)</div>
+                <div id="metric-ts" class="font-mono text-sm font-bold text-emerald-400">7.00 s</div>
+              </div>
+              <div class="bg-slate-900 p-2 rounded-lg">
+                <div class="text-slate-400 text-[11px]">上升時間 $T_r$ (10-90%)</div>
+                <div id="metric-tr" class="font-mono text-sm font-bold text-indigo-400">0.69 s</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step Response Chart & s-Plane Pole Map -->
+        <div class="lg:col-span-8 space-y-5">
+          <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5">
+            <h4 class="text-sm font-bold text-white mb-3">單位步階響應曲線 $y(t)$ (Unit Step Response, pp. 12–20)</h4>
+            <div class="relative h-72">
+              <canvas id="step-chart"></canvas>
+            </div>
+          </div>
+
+          <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 flex flex-col sm:flex-row items-center gap-5">
+            <div class="w-full sm:w-56 h-48 bg-[#070a12] border border-slate-800 rounded-xl flex items-center justify-center">
+              <svg id="pole-zero-svg" viewBox="0 0 220 180" class="w-full h-full"></svg>
+            </div>
+            <div class="flex-1 space-y-2 text-xs text-slate-300 leading-relaxed">
+              <h4 class="text-sm font-bold text-cyan-300">複數 $s$ 平面極點幾何意義 (Fig. 3-3 & Fig. 3-8)</h4>
+              <p>• <strong>極點實部 $\sigma = -\zeta\omega_n$</strong>：決定指數衰減包絡線 $e^{-\zeta\omega_n t}$ 與 2% 安定時間 $T_s \approx \frac{4}{\zeta\omega_n}$。垂直移動極點時包絡線不變。</p>
+              <p>• <strong>極點虛部 $\omega_d = \omega_n\sqrt{1-\zeta^2}$</strong>：決定正弦振盪頻率與峰值時間 $T_p = \frac{\pi}{\omega_d}$。水平移動極點時振盪頻率不變。</p>
+              <p>• <strong>極角 $\theta = \cos^{-1}\zeta$</strong>：由原點射出的斜率固定時，阻尼比 $\zeta$ 與最大超越量 $\%OS$ 保持不變。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LAB 2: Routh-Hurwitz Stability Calculator -->
+      <div id="lab-panel-routh" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-5 bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-4">
+          <h3 class="text-sm font-bold text-indigo-300">Ch.4 羅斯-赫維茲穩定度自動檢驗器 (pp. 24–26)</h3>
+          <p class="text-xs text-slate-400">輸入五階以內特徵多項式 $D(s) = a_5 s^5 + a_4 s^4 + a_3 s^3 + a_2 s^2 + a_1 s + a_0$ 係數，或點擊講義範例：</p>
+
+          <div class="grid grid-cols-1 gap-2">
+            <button data-coeffs="1,3,5,2,11,15" class="routh-preset-btn px-3 py-2 rounded-xl bg-slate-800 hover:bg-indigo-600/40 border border-slate-700 text-xs text-left">
+              📌 <strong>p.26 習題 2</strong>：$s^5 + 3s^4 + 5s^3 + 2s^2 + 11s + 15 = 0$
+            </button>
+            <button data-coeffs="1,2,2,4,11,10" class="routh-preset-btn px-3 py-2 rounded-xl bg-slate-800 hover:bg-indigo-600/40 border border-slate-700 text-xs text-left">
+              📌 <strong>p.25 範例 1 (首項為 0 之 $\varepsilon$ 法)</strong>：$s^5 + 2s^4 + 2s^3 + 4s^2 + 11s + 10 = 0$
+            </button>
+            <button data-coeffs="1,1,2,2,1,1" class="routh-preset-btn px-3 py-2 rounded-xl bg-slate-800 hover:bg-indigo-600/40 border border-slate-700 text-xs text-left">
+              📌 <strong>p.25 範例 2 (整列為 0 之 $U(s)$ 法)</strong>：$s^5 + s^4 + 2s^3 + 2s^2 + s + 1 = 0$
+            </button>
+            <button data-coeffs="0,0,1,3,6,5" class="routh-preset-btn px-3 py-2 rounded-xl bg-slate-800 hover:bg-indigo-600/40 border border-slate-700 text-xs text-left">
+              📌 <strong>p.26 習題 1 (當 K=1 時穩定三階系統)</strong>：$s^3 + 3s^2 + 4s + 5 = 0$
+            </button>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-800">
+            <div>
+              <label for="routh-a5" class="text-[11px] text-slate-400 font-mono">$a_5 (s^5)$</label>
+              <input id="routh-a5" type="number" step="any" value="1" class="w-full px-2.5 py-1.5 rounded-lg bg-slate-950 border border-slate-700 text-xs font-mono" />
+            </div>
+            <div>
+              <label for="routh-a4" class="text-[11px] text-slate-400 font-mono">$a_4 (s^4)$</label>
+              <input id="routh-a4" type="number" step="any" value="3" class="w-full px-2.5 py-1.5 rounded-lg bg-slate-950 border border-slate-700 text-xs font-mono" />
+            </div>
+            <div>
+              <label for="routh-a3" class="text-[11px] text-slate-400 font-mono">$a_3 (s^3)$</label>
+              <input id="routh-a3" type="number" step="any" value="5" class="w-full px-2.5 py-1.5 rounded-lg bg-slate-950 border border-slate-700 text-xs font-mono" />
+            </div>
+            <div>
+              <label for="routh-a2" class="text-[11px] text-slate-400 font-mono">$a_2 (s^2)$</label>
+              <input id="routh-a2" type="number" step="any" value="2" class="w-full px-2.5 py-1.5 rounded-lg bg-slate-950 border border-slate-700 text-xs font-mono" />
+            </div>
+            <div>
+              <label for="routh-a1" class="text-[11px] text-slate-400 font-mono">$a_1 (s^1)$</label>
+              <input id="routh-a1" type="number" step="any" value="11" class="w-full px-2.5 py-1.5 rounded-lg bg-slate-950 border border-slate-700 text-xs font-mono" />
+            </div>
+            <div>
+              <label for="routh-a0" class="text-[11px] text-slate-400 font-mono">$a_0 (s^0)$</label>
+              <input id="routh-a0" type="number" step="any" value="15" class="w-full px-2.5 py-1.5 rounded-lg bg-slate-950 border border-slate-700 text-xs font-mono" />
+            </div>
+          </div>
+
+          <button id="btn-calc-routh" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition">
+            ⚡ 產生 Routh 表並判別穩定度
+          </button>
+        </div>
+
+        <div class="lg:col-span-7 bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-4">
+          <div id="routh-verdict-box" class="p-4 rounded-xl border"></div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs font-mono border-collapse bg-slate-950 rounded-xl overflow-hidden border border-slate-800" id="routh-table-el">
+            </table>
+          </div>
+          <p id="routh-note" class="text-xs text-slate-400 leading-relaxed"></p>
+        </div>
+      </div>
+
+      <!-- LAB 3: Bode Plot Simulator -->
+      <div id="lab-panel-bode" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-4 bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-4">
+          <h3 class="text-sm font-bold text-indigo-300">Ch.7 波德圖漸近線與頻率響應模擬器 (pp. 40–45)</h3>
+          <p class="text-xs text-slate-400">選擇講義範例系統，觀察真實頻率響應曲線與直線漸近線（Asymptotes）之轉折頻率與斜率變化：</p>
+
+          <div class="space-y-2">
+            <button data-bode="p42" class="bode-preset-btn w-full px-3 py-2.5 rounded-xl bg-indigo-600/30 border border-indigo-500/50 text-xs text-left text-white">
+              📌 <strong>p.42 綜合範例 (Fig. 7-10)</strong>：<br/>$G(s) = \frac{s+3}{(s+2)(s^2+2s+25)}$（轉折頻率 2, 3, 5 rad/s）
+            </button>
+            <button data-bode="rc" class="bode-preset-btn w-full px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-left text-slate-200">
+              📌 <strong>p.40 一階 RC 低通濾波器 (Fig. 7-6)</strong>：<br/>$G(s) = \frac{1}{s/a + 1}$（可下方滑桿調整頻寬 $\omega_{BW}=a$）
+            </button>
+            <button data-bode="second" class="bode-preset-btn w-full px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-left text-slate-200">
+              📌 <strong>p.42 二階共振峰效應 (Fig. 7-9)</strong>：<br/>$G(s) = \frac{\omega_n^2}{s^2 + 2\zeta\omega_n s + \omega_n^2}$（觀察阻尼比對轉折點峰值影響）
+            </button>
+          </div>
+
+          <div class="space-y-3 pt-3 border-t border-slate-800">
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <label for="bode-param-a" class="text-slate-300">轉折頻率 $\omega_c$ / 自然頻率 (rad/s)</label>
+                <span id="bode-val-a" class="font-mono text-cyan-400">5.0</span>
+              </div>
+              <input id="bode-param-a" type="range" min="1" max="20" step="0.5" value="5.0" class="w-full accent-indigo-500" />
+            </div>
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <label for="bode-param-zeta" class="text-slate-300">二階阻尼比 $\zeta$ (影響共振峰值)</label>
+                <span id="bode-val-zeta" class="font-mono text-cyan-400">0.20</span>
+              </div>
+              <input id="bode-param-zeta" type="range" min="0.1" max="1.2" step="0.05" value="0.20" class="w-full accent-indigo-500" />
+            </div>
+          </div>
+
+          <div id="bode-info-card" class="bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs space-y-1.5 text-slate-300">
+          </div>
+        </div>
+
+        <div class="lg:col-span-8 space-y-4">
+          <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4">
+            <h4 class="text-xs font-bold text-slate-200 mb-2">波德大小圖 Magnitude Plot $20\log_{10}|G(j\omega)|$ (dB)</h4>
+            <div class="relative h-60">
+              <canvas id="bode-mag-chart"></canvas>
+            </div>
+          </div>
+          <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4">
+            <h4 class="text-xs font-bold text-slate-200 mb-2">波德相位圖 Phase Plot $\angle G(j\omega)$ (Degrees)</h4>
+            <div class="relative h-56">
+              <canvas id="bode-phase-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 4: SCHEMA (AGENTS.md), INDEX, LOG & SUBMISSION ==================== -->
+    <section id="view-schema" class="hidden space-y-5">
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap gap-2">
+          <button id="schema-sub-agents" data-schema="agents" class="schema-tab-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-600 text-white">
+            📜 AGENTS.md / CLAUDE.md 專案規則檔
+          </button>
+          <button id="schema-sub-index" data-schema="index" class="schema-tab-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">
+            🗂️ wiki/index.md 總目錄
+          </button>
+          <button id="schema-sub-log" data-schema="log" class="schema-tab-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">
+            ⏱️ wiki/log.md 維護日誌
+          </button>
+          <button id="schema-sub-submit" data-schema="submit" class="schema-tab-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-600/30 border border-emerald-500/40 text-emerald-200 hover:bg-emerald-600/50">
+            ✅ 作業繳交文案 (直接複製貼上)
+          </button>
+        </div>
+        <button id="btn-copy-schema" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-cyan-300 transition">
+          📋 複製目前檢視之 Markdown 原文
+        </button>
+      </div>
+
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <div id="schema-rendered-content" class="wiki-prose"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Toast Notification -->
+  <div id="toast-msg" class="fixed bottom-5 right-5 z-50 hidden px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-semibold shadow-xl">
+    已複製到剪貼簿！
+  </div>
+
+  <!-- Embedded Grounded Wiki Data -->
+  <script>
+    const WIKI_DATA = {"pages": [{"id": "ch01-introduction", "title": "Chapter 1: 自動控制導論 (Introduction to Control Systems)", "category": "chapter", "chapter": "Chapter 1", "source_pages": "pp. 1–3", "updated": "2026-11-14", "tags": ["SISO", "MIMO", "開迴路", "閉迴路", "迴授控制", "控制器設計流程"], "related": ["ch02-mathematical-model", "ch03-system-dynamics-transient", "ch04-stability", "ch05-steady-state-error"], "body": "# Chapter 1: 自動控制導論 (Introduction to Control Systems)\n\n> **核心摘要**：本章定義何謂「系統（System）」與「控制系統（Control System）」，區分單輸入單輸出（SISO）與多輸入多輸出（MIMO）系統，並闡述開迴路（Open-loop）與閉迴路迴授控制（Closed-loop Feedback Control）的架構差異，最後建立貫穿全課程的三大設計要求與六大控制器設計步驟。\n\n## 核心理論與系統架構\n\n### 1. 系統與控制系統的組成（pp. 2）\n- **系統（System）**：任何具有輸入（Input）與輸出（Output）的物件。\n  - **SISO（Single-Input-Single-Output）**：單一輸入與單一輸出系統（本課程核心討論對象）。\n  - **MIMO（Multi-Input-Multi-Output）**：多輸入多輸出系統。\n- **控制系統（Control System）**：由兩個子系統所組成（Fig. 1-1）：\n  1. **受控體（Plant）**：我們感興趣、欲加以控制的系統，通常包含**受控程序（Process）**與提供動力的**致動器（Actuator）**。\n  2. **控制器（Controller）**：產生適當控制輸入信號送給受控體，使受控體輸出符合期望表現。\n\n| 實例系統 | 受控體（Plant） | 控制器（Controller） |\n| :--- | :--- | :--- |\n| 人體系統 | 人體（Human being） | 大腦（Brain） |\n| 自行車騎乘 | 自行車（Bike） | 騎士（Rider） |\n| 電梯系統 | 電梯車廂與機構（Elevator） | 控制晶片（IC） |\n\n### 2. 開迴路與閉迴路控制系統（pp. 2–3）\n- **開迴路控制系統（Open-loop Control System）**：控制器的輸入不依賴受控體的實際輸出（典型實例：傳統烤麵包機 Toaster，僅依設定時間加熱，不感測吐司實際焦度）。\n- **閉迴路 / 迴授控制系統（Closed-loop / Feedback-controlled System）**：控制器的輸入取決於受控體的實際輸出 $y(t)$（Fig. 1-2）。必須具備兩個額外關鍵元件：\n  1. **感測器（Sensor / Output Transducer）**：量測受控體輸出信號 $y(t)$。\n  2. **比較器（Comparison System / Summing Junction）**：計算參考命令輸入 $r(t)$（或 $y_r$）與實際輸出 $y(t)$ 之間的誤差信號 $e(t) = r(t) - y(t)$。\n\n### 3. 系統響應分解與三大控制系統要求（pp. 3）\n系統的輸出響應 $y(t)$ 可分解為兩個部分：\n- **暫態響應（Transient Response）**：系統進入穩態之前的過渡過程，描述 $y(t)$ 趨近於命令 $r(t)$ 的方式。\n- **穩態響應（Steady-State Response）**：當時間 $t \\to \\infty$（或足夠大）時的系統響應；此時 $r(t) - y(t)$ 通常趨近於一個微小常數，稱為**穩態誤差（Steady-State Error）**。\n\n因此，控制系統設計的**三大核心要求**為：\n1. **暫態性能（Transient Performance）**（詳見 [[ch03-system-dynamics-transient|Chapter 3]]）\n2. **穩定度（Stability）**（詳見 [[ch04-stability|Chapter 4]]）\n3. **穩態誤差（Steady-State Error）**（詳見 [[ch05-steady-state-error|Chapter 5]]）\n\n## 控制器設計六大標準步驟（General Procedure for Controller Design, p. 3）\n\n1. **建立受控體數學模型**：由物理定律推導受控體（Plant）的數學模型（[[ch02-mathematical-model|Chapter 2]]）。\n2. **分析系統動態**：研究受控體本身的暫態與穩態動態特性（[[ch03-system-dynamics-transient|Chapter 3]]）。\n3. **明定設計規格**：制定暫態性能指標、穩定度與穩態誤差要求（[[ch04-stability|Chapter 4]]、[[ch05-steady-state-error|Chapter 5]]）。\n4. **設計控制器**：運用古典控制兩大核心技術——**根軌跡法（[[ch06-root-locus|Chapter 6]]）**或**頻率響應法（[[ch07-frequency-response|Chapter 7]]）**設計控制器。\n5. **檢驗整體閉迴路系統**：驗證設計後的整體系統是否滿足所有規格。\n6. **重新設計（若需要）**：若未達標則迭代修正控制器參數或結構。\n\n## 關聯知識節點（Cross-References）\n- [[ch02-mathematical-model|Chapter 2: 數學模型與轉移函數]]\n- [[ch03-system-dynamics-transient|Chapter 3: 系統動態與暫態性能]]\n- [[ch04-stability|Chapter 4: 穩定度分析]]\n- [[ch05-steady-state-error|Chapter 5: 穩態誤差]]\n- [[ch06-root-locus|Chapter 6: 根軌跡法]]\n- [[ch07-frequency-response|Chapter 7: 頻率響應法]]", "raw": "---\nid: ch01-introduction\ntitle: \"Chapter 1: 自動控制導論 (Introduction to Control Systems)\"\ncategory: chapter\nchapter: \"Chapter 1\"\nsource_pages: \"pp. 1–3\"\nupdated: 2026-11-14\ntags: [SISO, MIMO, 開迴路, 閉迴路, 迴授控制, 控制器設計流程]\nrelated: [ch02-mathematical-model, ch03-system-dynamics-transient, ch04-stability, ch05-steady-state-error]\n---\n\n# Chapter 1: 自動控制導論 (Introduction to Control Systems)\n\n> **核心摘要**：本章定義何謂「系統（System）」與「控制系統（Control System）」，區分單輸入單輸出（SISO）與多輸入多輸出（MIMO）系統，並闡述開迴路（Open-loop）與閉迴路迴授控制（Closed-loop Feedback Control）的架構差異，最後建立貫穿全課程的三大設計要求與六大控制器設計步驟。\n\n## 核心理論與系統架構\n\n### 1. 系統與控制系統的組成（pp. 2）\n- **系統（System）**：任何具有輸入（Input）與輸出（Output）的物件。\n  - **SISO（Single-Input-Single-Output）**：單一輸入與單一輸出系統（本課程核心討論對象）。\n  - **MIMO（Multi-Input-Multi-Output）**：多輸入多輸出系統。\n- **控制系統（Control System）**：由兩個子系統所組成（Fig. 1-1）：\n  1. **受控體（Plant）**：我們感興趣、欲加以控制的系統，通常包含**受控程序（Process）**與提供動力的**致動器（Actuator）**。\n  2. **控制器（Controller）**：產生適當控制輸入信號送給受控體，使受控體輸出符合期望表現。\n\n| 實例系統 | 受控體（Plant） | 控制器（Controller） |\n| :--- | :--- | :--- |\n| 人體系統 | 人體（Human being） | 大腦（Brain） |\n| 自行車騎乘 | 自行車（Bike） | 騎士（Rider） |\n| 電梯系統 | 電梯車廂與機構（Elevator） | 控制晶片（IC） |\n\n### 2. 開迴路與閉迴路控制系統（pp. 2–3）\n- **開迴路控制系統（Open-loop Control System）**：控制器的輸入不依賴受控體的實際輸出（典型實例：傳統烤麵包機 Toaster，僅依設定時間加熱，不感測吐司實際焦度）。\n- **閉迴路 / 迴授控制系統（Closed-loop / Feedback-controlled System）**：控制器的輸入取決於受控體的實際輸出 $y(t)$（Fig. 1-2）。必須具備兩個額外關鍵元件：\n  1. **感測器（Sensor / Output Transducer）**：量測受控體輸出信號 $y(t)$。\n  2. **比較器（Comparison System / Summing Junction）**：計算參考命令輸入 $r(t)$（或 $y_r$）與實際輸出 $y(t)$ 之間的誤差信號 $e(t) = r(t) - y(t)$。\n\n### 3. 系統響應分解與三大控制系統要求（pp. 3）\n系統的輸出響應 $y(t)$ 可分解為兩個部分：\n- **暫態響應（Transient Response）**：系統進入穩態之前的過渡過程，描述 $y(t)$ 趨近於命令 $r(t)$ 的方式。\n- **穩態響應（Steady-State Response）**：當時間 $t \\to \\infty$（或足夠大）時的系統響應；此時 $r(t) - y(t)$ 通常趨近於一個微小常數，稱為**穩態誤差（Steady-State Error）**。\n\n因此，控制系統設計的**三大核心要求**為：\n1. **暫態性能（Transient Performance）**（詳見 [[ch03-system-dynamics-transient|Chapter 3]]）\n2. **穩定度（Stability）**（詳見 [[ch04-stability|Chapter 4]]）\n3. **穩態誤差（Steady-State Error）**（詳見 [[ch05-steady-state-error|Chapter 5]]）\n\n## 控制器設計六大標準步驟（General Procedure for Controller Design, p. 3）\n\n1. **建立受控體數學模型**：由物理定律推導受控體（Plant）的數學模型（[[ch02-mathematical-model|Chapter 2]]）。\n2. **分析系統動態**：研究受控體本身的暫態與穩態動態特性（[[ch03-system-dynamics-transient|Chapter 3]]）。\n3. **明定設計規格**：制定暫態性能指標、穩定度與穩態誤差要求（[[ch04-stability|Chapter 4]]、[[ch05-steady-state-error|Chapter 5]]）。\n4. **設計控制器**：運用古典控制兩大核心技術——**根軌跡法（[[ch06-root-locus|Chapter 6]]）**或**頻率響應法（[[ch07-frequency-response|Chapter 7]]）**設計控制器。\n5. **檢驗整體閉迴路系統**：驗證設計後的整體系統是否滿足所有規格。\n6. **重新設計（若需要）**：若未達標則迭代修正控制器參數或結構。\n\n## 關聯知識節點（Cross-References）\n- [[ch02-mathematical-model|Chapter 2: 數學模型與轉移函數]]\n- [[ch03-system-dynamics-transient|Chapter 3: 系統動態與暫態性能]]\n- [[ch04-stability|Chapter 4: 穩定度分析]]\n- [[ch05-steady-state-error|Chapter 5: 穩態誤差]]\n- [[ch06-root-locus|Chapter 6: 根軌跡法]]\n- [[ch07-frequency-response|Chapter 7: 頻率響應法]]\n", "path": "wiki/chapters/ch01-introduction.md"}, {"id": "ch02-mathematical-model", "title": "Chapter 2: 數學模型與轉移函數 (Mathematical Model)", "category": "chapter", "chapter": "Chapter 2", "source_pages": "pp. 4–8", "updated": "2026-11-14", "tags": ["數學建模", "伺服馬達", "進給驅動系統", "拉氏轉換", "轉移函數", "方塊圖", "因果性"], "related": ["ch01-introduction", "transfer-function-and-causality", "ch03-system-dynamics-transient"], "body": "# Chapter 2: 數學模型與轉移函數 (Mathematical Model)\n\n> **核心摘要**：本章以工具機與硬碟常見的「單軸進給驅動系統（Feed Drive System）」為實例，示範如何結合電路定律（KVL）與牛頓力學建立微分方程模型，並透過零初始條件下的拉氏轉換（Laplace Transform）導出線性非時變 SISO 系統的唯一表徵——**轉移函數 $G(s)$**，最後探討方塊圖代數與系統因果性（Causality）。\n\n## 核心理論與數學推導\n\n### 1. 進給驅動系統（Feed Drive System）物理建模（pp. 4–5, Fig. 2-1 & 2-2）\n考慮由永磁直流伺服馬達（Servo Motor）連接滾珠螺桿（Ball Screw）驅動工作平台（Table）的單軸運動系統：\n- **假設條件**：所有構件皆為剛體（Rigid body），忽略摩擦力与背隙（Backlash），滾珠螺桿導程（Pitch）設為 $1$，故平台位移 $y(t) = \\theta(t)$（轉子角位移），且轉速 $\\omega(t) = \\dot{\\theta}(t) = \\dot{y}(t)$。\n- **電樞電路動態（Armature Circuit Dynamics）**：輸入電壓 $v(t)$ 與電樞電流 $i(t)$ 滿足：\n  $$L_a \\frac{di}{dt} + R_a i = v, \\quad T_m(t) = k_m i(t) \\quad \\text{(2-1)}$$\n- **轉子機械動態（Mechanical Dynamics）**：轉子慣量 $J$ 與阻尼 $B$ 滿足：\n  $$J \\frac{d\\omega}{dt} + B\\omega = T_m \\implies J\\ddot{y} + B\\dot{y} = k_m i \\quad \\text{(2-2, 2-3)}$$\n- **整合輸入-輸出微分方程**：將 $i = \\frac{1}{k_m}(J\\ddot{y} + B\\dot{y})$ 代入 (2-1)，可得三階常微分方程式：\n  $$L_a J \\dddot{y} + (L_a B + R_a J)\\ddot{y} + R_a B \\dot{y} = k_m v \\quad \\text{(2-4)}$$\n\n### 2. 系統數學建模六步驟（p. 5）\n1. 繪製系統示意圖（Schematic diagram）。\n2. 做出合理工程假設（Make appropriate assumptions）。\n3. 確認感興趣的輸入與輸出變數。\n4. 將複雜系統拆解為多個子系統（Subsystems）並標註彼此連接關係。\n5. 依據物理定律推導各子系統的數學模型。\n6. 整合各子系統模型，消去中間變數以獲得輸入與輸出的整體關係式。\n\n### 3. 拉氏轉換與轉移函數（Laplace Transform & Transfer Function, pp. 5–7）\n在**零初始條件（Zero initial conditions，$t < 0$ 時所有信號為 0）**假設下，信號 $y(t)$ 及其 $n$ 階導數的拉氏轉換為：\n$$\\mathcal{L}[y(t)] = Y(s) = \\int_0^\\infty y(t)e^{-st}dt, \\quad \\mathcal{L}\\left[y^{(n)}(t)\\right] = s^n Y(s) \\quad \\text{(2-5 ~ 2-7)}$$\n對進給驅動系統 (2-4) 取拉氏轉換可得 $Y(s) = G(s)V(s)$，其中**轉移函數（Transfer Function）**為：\n$$G(s) = \\frac{Y(s)}{V(s)} = \\frac{k_m}{L_a J s^3 + (L_a B + R_a J)s^2 + R_a B s} = \\left(\\frac{1}{L_a s + R_a}\\right)\\left(\\frac{k_m}{Js^2 + Bs}\\right) \\quad \\text{(2-10, 2-13)}$$\n\n## 典型例題與習題解析（pp. 6–7）\n\n1. **Exercise 1（溫度計液柱轉移函數, p. 6）**：\n   - 已知微分方程 $\\dot{l} + a l = b T$，輸入為環境溫度 $T(t)$，輸出為液柱長度 $l(t)$。\n   - 取拉氏轉換（零初始條件）：$sL(s) + aL(s) = bT(s) \\implies G(s) = \\frac{L(s)}{T(s)} = \\frac{b}{s + a}$。\n2. **Exercise 2（RLC 串聯電路轉移函數, p. 6）**：\n   - 輸入電壓 $v(t) = R i + L \\frac{di}{dt} + v_c$，且 $i = C \\frac{dv_c}{dt}$，輸出為電容電壓 $v_c(t)$。\n   - 取拉氏轉換：$V(s) = (LCs^2 + RCs + 1)V_c(s) \\implies G(s) = \\frac{V_c(s)}{V(s)} = \\frac{1}{LCs^2 + RCs + 1}$。\n3. **Example（包含反電動勢 Back-EMF $k_b$ 之進給驅動系統, p. 7）**：\n   - 當考慮馬達反電動勢迴授 $v_b = k_b \\dot{y}$ 時，電樞電壓有效輸入為 $V(s) - k_b s Y(s)$。\n   - 由迴授方塊圖化簡可得：\n     $$G(s) = \\frac{Y(s)}{V(s)} = \\frac{k_m}{s\\left[(L_a s + R_a)(Js + B) + k_m k_b\\right]} = \\frac{k_m}{L_a J s^3 + (L_a B + R_a J)s^2 + (R_a B + k_m k_b)s}$$\n4. **Exercise（Fig. 2-5 位置控制系統閉迴路轉移函數, p. 7）**：\n   - 前向控制器含比例與前饋通道 $(2 + 2s)$，內迴路受控體為 $\\frac{4+3s}{s} \\cdot \\frac{1}{s}$ 並具單位速度迴授，外迴路經積分器 $\\frac{1}{s}$ 後進行位置負迴授。利用方塊圖代數由內而外逐層化簡即可求得 $\\frac{Y(s)}{R(s)}$。\n\n## 關聯知識節點（Cross-References）\n- [[transfer-function-and-causality|概念卡：轉移函數性質與系統因果性 (Proper vs. Improper)]]\n- [[ch01-introduction|Chapter 1: 自動控制導論]]\n- [[ch03-system-dynamics-transient|Chapter 3: 系統動態與暫態性能]]", "raw": "---\nid: ch02-mathematical-model\ntitle: \"Chapter 2: 數學模型與轉移函數 (Mathematical Model)\"\ncategory: chapter\nchapter: \"Chapter 2\"\nsource_pages: \"pp. 4–8\"\nupdated: 2026-11-14\ntags: [數學建模, 伺服馬達, 進給驅動系統, 拉氏轉換, 轉移函數, 方塊圖, 因果性]\nrelated: [ch01-introduction, transfer-function-and-causality, ch03-system-dynamics-transient]\n---\n\n# Chapter 2: 數學模型與轉移函數 (Mathematical Model)\n\n> **核心摘要**：本章以工具機與硬碟常見的「單軸進給驅動系統（Feed Drive System）」為實例，示範如何結合電路定律（KVL）與牛頓力學建立微分方程模型，並透過零初始條件下的拉氏轉換（Laplace Transform）導出線性非時變 SISO 系統的唯一表徵——**轉移函數 $G(s)$**，最後探討方塊圖代數與系統因果性（Causality）。\n\n## 核心理論與數學推導\n\n### 1. 進給驅動系統（Feed Drive System）物理建模（pp. 4–5, Fig. 2-1 & 2-2）\n考慮由永磁直流伺服馬達（Servo Motor）連接滾珠螺桿（Ball Screw）驅動工作平台（Table）的單軸運動系統：\n- **假設條件**：所有構件皆為剛體（Rigid body），忽略摩擦力与背隙（Backlash），滾珠螺桿導程（Pitch）設為 $1$，故平台位移 $y(t) = \\theta(t)$（轉子角位移），且轉速 $\\omega(t) = \\dot{\\theta}(t) = \\dot{y}(t)$。\n- **電樞電路動態（Armature Circuit Dynamics）**：輸入電壓 $v(t)$ 與電樞電流 $i(t)$ 滿足：\n  $$L_a \\frac{di}{dt} + R_a i = v, \\quad T_m(t) = k_m i(t) \\quad \\text{(2-1)}$$\n- **轉子機械動態（Mechanical Dynamics）**：轉子慣量 $J$ 與阻尼 $B$ 滿足：\n  $$J \\frac{d\\omega}{dt} + B\\omega = T_m \\implies J\\ddot{y} + B\\dot{y} = k_m i \\quad \\text{(2-2, 2-3)}$$\n- **整合輸入-輸出微分方程**：將 $i = \\frac{1}{k_m}(J\\ddot{y} + B\\dot{y})$ 代入 (2-1)，可得三階常微分方程式：\n  $$L_a J \\dddot{y} + (L_a B + R_a J)\\ddot{y} + R_a B \\dot{y} = k_m v \\quad \\text{(2-4)}$$\n\n### 2. 系統數學建模六步驟（p. 5）\n1. 繪製系統示意圖（Schematic diagram）。\n2. 做出合理工程假設（Make appropriate assumptions）。\n3. 確認感興趣的輸入與輸出變數。\n4. 將複雜系統拆解為多個子系統（Subsystems）並標註彼此連接關係。\n5. 依據物理定律推導各子系統的數學模型。\n6. 整合各子系統模型，消去中間變數以獲得輸入與輸出的整體關係式。\n\n### 3. 拉氏轉換與轉移函數（Laplace Transform & Transfer Function, pp. 5–7）\n在**零初始條件（Zero initial conditions，$t < 0$ 時所有信號為 0）**假設下，信號 $y(t)$ 及其 $n$ 階導數的拉氏轉換為：\n$$\\mathcal{L}[y(t)] = Y(s) = \\int_0^\\infty y(t)e^{-st}dt, \\quad \\mathcal{L}\\left[y^{(n)}(t)\\right] = s^n Y(s) \\quad \\text{(2-5 ~ 2-7)}$$\n對進給驅動系統 (2-4) 取拉氏轉換可得 $Y(s) = G(s)V(s)$，其中**轉移函數（Transfer Function）**為：\n$$G(s) = \\frac{Y(s)}{V(s)} = \\frac{k_m}{L_a J s^3 + (L_a B + R_a J)s^2 + R_a B s} = \\left(\\frac{1}{L_a s + R_a}\\right)\\left(\\frac{k_m}{Js^2 + Bs}\\right) \\quad \\text{(2-10, 2-13)}$$\n\n## 典型例題與習題解析（pp. 6–7）\n\n1. **Exercise 1（溫度計液柱轉移函數, p. 6）**：\n   - 已知微分方程 $\\dot{l} + a l = b T$，輸入為環境溫度 $T(t)$，輸出為液柱長度 $l(t)$。\n   - 取拉氏轉換（零初始條件）：$sL(s) + aL(s) = bT(s) \\implies G(s) = \\frac{L(s)}{T(s)} = \\frac{b}{s + a}$。\n2. **Exercise 2（RLC 串聯電路轉移函數, p. 6）**：\n   - 輸入電壓 $v(t) = R i + L \\frac{di}{dt} + v_c$，且 $i = C \\frac{dv_c}{dt}$，輸出為電容電壓 $v_c(t)$。\n   - 取拉氏轉換：$V(s) = (LCs^2 + RCs + 1)V_c(s) \\implies G(s) = \\frac{V_c(s)}{V(s)} = \\frac{1}{LCs^2 + RCs + 1}$。\n3. **Example（包含反電動勢 Back-EMF $k_b$ 之進給驅動系統, p. 7）**：\n   - 當考慮馬達反電動勢迴授 $v_b = k_b \\dot{y}$ 時，電樞電壓有效輸入為 $V(s) - k_b s Y(s)$。\n   - 由迴授方塊圖化簡可得：\n     $$G(s) = \\frac{Y(s)}{V(s)} = \\frac{k_m}{s\\left[(L_a s + R_a)(Js + B) + k_m k_b\\right]} = \\frac{k_m}{L_a J s^3 + (L_a B + R_a J)s^2 + (R_a B + k_m k_b)s}$$\n4. **Exercise（Fig. 2-5 位置控制系統閉迴路轉移函數, p. 7）**：\n   - 前向控制器含比例與前饋通道 $(2 + 2s)$，內迴路受控體為 $\\frac{4+3s}{s} \\cdot \\frac{1}{s}$ 並具單位速度迴授，外迴路經積分器 $\\frac{1}{s}$ 後進行位置負迴授。利用方塊圖代數由內而外逐層化簡即可求得 $\\frac{Y(s)}{R(s)}$。\n\n## 關聯知識節點（Cross-References）\n- [[transfer-function-and-causality|概念卡：轉移函數性質與系統因果性 (Proper vs. Improper)]]\n- [[ch01-introduction|Chapter 1: 自動控制導論]]\n- [[ch03-system-dynamics-transient|Chapter 3: 系統動態與暫態性能]]\n", "path": "wiki/chapters/ch02-mathematical-model.md"}, {"id": "ch03-system-dynamics-transient", "title": "Chapter 3: 系統動態與暫態性能 (System Dynamics and Transient Performance)", "category": "chapter", "chapter": "Chapter 3", "source_pages": "pp. 9–20", "updated": "2026-11-14", "tags": ["一階系統", "時間常數", "二階系統", "阻尼比", "自然頻率", "超越量", "安定時間", "零點效應", "主導極點"], "related": ["ch02-mathematical-model", "second-order-performance-indices", "effects-of-zeros-and-dominant-poles", "ch04-stability"], "body": "# Chapter 3: 系統動態與暫態性能 (System Dynamics and Transient Performance)\n\n> **核心摘要**：本章深入剖析系統輸出的齊次解（自由響應 / 暫態響應）與特解（強迫響應 / 穩態響應），建立一階系統的時間常數 $\\tau$ 與標準二階系統的四種阻尼分類（無阻尼、欠阻尼、臨界阻尼、過阻尼），推導四大暫態性能指標（$T_r, T_p, T_s, \\%OS$）與極點位置在 $s$ 平面的幾何對應，並探討附加零點（反相 Undershoot）與主導極點近似法則。\n\n## 核心理論與數學推導\n\n### 1. 自由響應與強迫響應（Free vs. Forced Response, p. 9）\n以電樞電流 $i$ 控制轉速 $\\omega$ 的一階伺服馬達為例：$J\\dot{\\omega} + b\\omega = k_m i \\implies G(s) = \\frac{\\Omega(s)}{I(s)} = \\frac{k_m}{Js + b}$ (3-1, 3-2)。\n- **齊次解 $\\omega_h(t) = c e^{-\\frac{b}{J}t}$**：無輸入時的響應，稱為**自由響應（Free / Natural Response）**，在穩定系統中隨時間指數衰減，即為**暫態響應（Transient Response）**。\n- **特解 $\\omega_p(t) = \\frac{k_m}{b}$（單位步階輸入下）**：由輸入激發的響應，稱為**強迫響應（Forced Response）**，當 $t \\to \\infty$ 時即為**穩態響應（Steady-State Response）**。\n- 零初始條件下之完整單位步階響應：$\\omega(t) = \\frac{k_m}{b}\\left(1 - e^{-\\frac{b}{J}t}\\right)$ (3-6)。\n\n### 2. 一階系統動態與時間常數（First-Order Systems, pp. 10–11）\n給定嚴格真分一階系統 $G(s) = \\frac{k}{s + a}$ (3-8)，其極點位於 $s = -a$，單位步階響應為：\n$$y(t) = \\frac{k}{a}\\left(1 - e^{-at}\\right) \\quad \\text{(3-9)}$$\n- **時間常數（Time Constant）$\\tau = \\frac{1}{a}$**：決定指數收斂快慢的唯一指標，可由步階響應圖（Fig. 3-1）透過兩種圖解法求得：\n  1. **63.2% 法**：當 $t = \\tau$ 時，$y(\\tau) = \\frac{k}{a}(1 - e^{-1}) \\approx 0.632 \\frac{k}{a}$（達到穩態值的 63%）。\n  2. **初始切線法**：在 $t = 0$ 處的切線 $y = \\dot{y}(0)t = kt$ 與穩態水平線 $y_{ss} = \\frac{k}{a}$ 交於 $t = \\frac{1}{a} = \\tau$。\n- **習題判讀（pp. 10–11, Fig. A & Fig. B）**：\n  - **Fig. A** 為標準一階系統步階響應：穩態值為 $2$，在 $t=0$ 處斜率非零且單調凹向下，達 $2 \\times 0.632 = 1.264$ 時對應時間約為 $\\tau = 2\\text{ sec}$。\n  - **Fig. B** **不是**一階系統：因為在 $t = 0$ 處斜率趨近於 0 且具有反曲點（S 型曲線），代表系統至少為二階以上（過阻尼或臨界阻尼系統）。\n\n### 3. 二階系統動態與四種阻尼型態（Second-Order Systems, pp. 11–14）\n考慮質量-彈簧-阻尼系統 $m\\ddot{x} + c\\dot{x} + kx = f \\implies G(s) = \\frac{1}{ms^2 + cs + k}$ (3-11, 3-12)。引入**自然頻率 $\\omega_n = \\sqrt{\\frac{k}{m}}$** 與**阻尼比（Damping Ratio）$\\zeta = \\frac{c}{2\\sqrt{mk}}$** (3-14)，特徵方程式可標準化為：\n$$s^2 + 2\\zeta\\omega_n s + \\omega_n^2 = 0 \\implies s = -\\zeta\\omega_n \\pm j\\omega_n\\sqrt{1-\\zeta^2} = -\\zeta\\omega_n \\pm j\\omega_d \\quad \\text{(3-19)}$$\n\n| 阻尼分類 | 阻尼比範圍 | 極點特性 | 單位步階響應行為（Eq. 3-15 ~ 3-18） |\n| :--- | :--- | :--- | :--- |\n| **無阻尼（Undamped）** | $\\zeta = 0$ | 虛軸共軛純虛根 $\\pm j\\omega_n$ | 等幅簡諧振盪 $x(t) = \\frac{1}{k}(1 - \\cos\\omega_n t)$ |\n| **欠阻尼（Under-damped）** | $0 < \\zeta < 1$ | 左半平面共軛複數根 $-\\zeta\\omega_n \\pm j\\omega_d$ | 指數衰減包絡線乘上阻尼自然頻率 $\\omega_d = \\omega_n\\sqrt{1-\\zeta^2}$ 振盪（最常見控制系統） |\n| **臨界阻尼（Critically damped）** | $\\zeta = 1$ | 負實軸重根 $-\\omega_n, -\\omega_n$ | 無超越量且最快收斂：$x(t) = \\frac{1}{k}[1 - (1 + \\omega_n t)e^{-\\omega_n t}]$ |\n| **過阻尼（Over-damped）** | $\\zeta > 1$ | 兩個相異負實根 $-\\omega_n(\\zeta \\pm \\sqrt{\\zeta^2-1})$ | 兩個相異一階指數響應疊加，無振盪但反應較慢 |\n\n### 4. 標準二階系統暫態性能指標（Performance Indices, pp. 14–17）\n對於標準二階系統 $G(s) = \\frac{\\omega_n^2}{s^2 + 2\\zeta\\omega_n s + \\omega_n^2}$（$0 < \\zeta < 1$）：\n- **上升時間（Rise Time, $T_r$）**：輸出由穩態值的 10% 上升至 90% 所需時間（查圖 Fig. 3-7b）。\n- **峰值時間（Peak Time, $T_p$）**：到達第一個最高峰（$n=1$）的時間：\n  $$T_p = \\frac{\\pi}{\\omega_d} = \\frac{\\pi}{\\omega_n\\sqrt{1-\\zeta^2}} \\quad \\text{(3-26)}$$\n- **最大超越量（Percent Overshoot, $\\%OS$）**：僅由阻尼比 $\\zeta$ 唯一決定：\n  $$\\%OS = \\frac{M}{x_{ss}} = e^{-\\frac{\\pi\\zeta}{\\sqrt{1-\\zeta^2}}} \\times 100\\% \\quad \\text{(3-25)}$$\n- **2% 安定時間（Settling Time, $T_s$）**：進入並維持在穩態值 $\\pm 2\\%$ 誤差帶內的時間：\n  $$T_s \\approx \\frac{4}{\\zeta\\omega_n} \\quad \\text{(3-24)}$$\n\n### 5. 零點效應、非最小相位與主導極點（pp. 17–20）\n- **左半平面零點（$s = -z, z > 0$）**：系統 $G(s) = \\frac{(\\omega_n^2/z)(s+z)}{s^2+2\\zeta\\omega_n s+\\omega_n^2} = \\frac{s}{z}G_{\\text{std}}(s) + G_{\\text{std}}(s)$，其步階響應為 $y(t) = c(t) + \\frac{1}{z}\\frac{dc(t)}{dt}$。當 $z$ 愈小（零點愈靠近虛軸），微分項權重愈大，導致**超越量 $\\%OS$ 顯著變大、上升變快**（Fig. 3-10）。\n- **右半平面零點（$z < 0$，非最小相位系統 Nonminimum Phase System）**：由於初始微分項符號相反，步階響應在起步時會先往反方向下掉，產生**下衝（Undershoot）**現象（Fig. 3-11）。\n- **主導極點（Dominant Poles, p. 19）**：一般高階系統可部分分式拆解為一階與二階系統之和（Eq. 3-30）。實部最靠近虛軸的極點衰減最慢，主宰整體暫態響應，稱為**主導極點**（若附加極點距離虛軸為主導極點的 5 倍以上，如 $-10 \\ll -2$，其影響可忽略）。\n\n## 關聯知識節點（Cross-References）\n- [[second-order-performance-indices|概念卡：二階系統暫態性能指標與極點幾何對應]]\n- [[effects-of-zeros-and-dominant-poles|概念卡：零點效應、非最小相位下衝與主導極點近似]]\n- [[ch04-stability|Chapter 4: 穩定度分析]]", "raw": "---\nid: ch03-system-dynamics-transient\ntitle: \"Chapter 3: 系統動態與暫態性能 (System Dynamics and Transient Performance)\"\ncategory: chapter\nchapter: \"Chapter 3\"\nsource_pages: \"pp. 9–20\"\nupdated: 2026-11-14\ntags: [一階系統, 時間常數, 二階系統, 阻尼比, 自然頻率, 超越量, 安定時間, 零點效應, 主導極點]\nrelated: [ch02-mathematical-model, second-order-performance-indices, effects-of-zeros-and-dominant-poles, ch04-stability]\n---\n\n# Chapter 3: 系統動態與暫態性能 (System Dynamics and Transient Performance)\n\n> **核心摘要**：本章深入剖析系統輸出的齊次解（自由響應 / 暫態響應）與特解（強迫響應 / 穩態響應），建立一階系統的時間常數 $\\tau$ 與標準二階系統的四種阻尼分類（無阻尼、欠阻尼、臨界阻尼、過阻尼），推導四大暫態性能指標（$T_r, T_p, T_s, \\%OS$）與極點位置在 $s$ 平面的幾何對應，並探討附加零點（反相 Undershoot）與主導極點近似法則。\n\n## 核心理論與數學推導\n\n### 1. 自由響應與強迫響應（Free vs. Forced Response, p. 9）\n以電樞電流 $i$ 控制轉速 $\\omega$ 的一階伺服馬達為例：$J\\dot{\\omega} + b\\omega = k_m i \\implies G(s) = \\frac{\\Omega(s)}{I(s)} = \\frac{k_m}{Js + b}$ (3-1, 3-2)。\n- **齊次解 $\\omega_h(t) = c e^{-\\frac{b}{J}t}$**：無輸入時的響應，稱為**自由響應（Free / Natural Response）**，在穩定系統中隨時間指數衰減，即為**暫態響應（Transient Response）**。\n- **特解 $\\omega_p(t) = \\frac{k_m}{b}$（單位步階輸入下）**：由輸入激發的響應，稱為**強迫響應（Forced Response）**，當 $t \\to \\infty$ 時即為**穩態響應（Steady-State Response）**。\n- 零初始條件下之完整單位步階響應：$\\omega(t) = \\frac{k_m}{b}\\left(1 - e^{-\\frac{b}{J}t}\\right)$ (3-6)。\n\n### 2. 一階系統動態與時間常數（First-Order Systems, pp. 10–11）\n給定嚴格真分一階系統 $G(s) = \\frac{k}{s + a}$ (3-8)，其極點位於 $s = -a$，單位步階響應為：\n$$y(t) = \\frac{k}{a}\\left(1 - e^{-at}\\right) \\quad \\text{(3-9)}$$\n- **時間常數（Time Constant）$\\tau = \\frac{1}{a}$**：決定指數收斂快慢的唯一指標，可由步階響應圖（Fig. 3-1）透過兩種圖解法求得：\n  1. **63.2% 法**：當 $t = \\tau$ 時，$y(\\tau) = \\frac{k}{a}(1 - e^{-1}) \\approx 0.632 \\frac{k}{a}$（達到穩態值的 63%）。\n  2. **初始切線法**：在 $t = 0$ 處的切線 $y = \\dot{y}(0)t = kt$ 與穩態水平線 $y_{ss} = \\frac{k}{a}$ 交於 $t = \\frac{1}{a} = \\tau$。\n- **習題判讀（pp. 10–11, Fig. A & Fig. B）**：\n  - **Fig. A** 為標準一階系統步階響應：穩態值為 $2$，在 $t=0$ 處斜率非零且單調凹向下，達 $2 \\times 0.632 = 1.264$ 時對應時間約為 $\\tau = 2\\text{ sec}$。\n  - **Fig. B** **不是**一階系統：因為在 $t = 0$ 處斜率趨近於 0 且具有反曲點（S 型曲線），代表系統至少為二階以上（過阻尼或臨界阻尼系統）。\n\n### 3. 二階系統動態與四種阻尼型態（Second-Order Systems, pp. 11–14）\n考慮質量-彈簧-阻尼系統 $m\\ddot{x} + c\\dot{x} + kx = f \\implies G(s) = \\frac{1}{ms^2 + cs + k}$ (3-11, 3-12)。引入**自然頻率 $\\omega_n = \\sqrt{\\frac{k}{m}}$** 與**阻尼比（Damping Ratio）$\\zeta = \\frac{c}{2\\sqrt{mk}}$** (3-14)，特徵方程式可標準化為：\n$$s^2 + 2\\zeta\\omega_n s + \\omega_n^2 = 0 \\implies s = -\\zeta\\omega_n \\pm j\\omega_n\\sqrt{1-\\zeta^2} = -\\zeta\\omega_n \\pm j\\omega_d \\quad \\text{(3-19)}$$\n\n| 阻尼分類 | 阻尼比範圍 | 極點特性 | 單位步階響應行為（Eq. 3-15 ~ 3-18） |\n| :--- | :--- | :--- | :--- |\n| **無阻尼（Undamped）** | $\\zeta = 0$ | 虛軸共軛純虛根 $\\pm j\\omega_n$ | 等幅簡諧振盪 $x(t) = \\frac{1}{k}(1 - \\cos\\omega_n t)$ |\n| **欠阻尼（Under-damped）** | $0 < \\zeta < 1$ | 左半平面共軛複數根 $-\\zeta\\omega_n \\pm j\\omega_d$ | 指數衰減包絡線乘上阻尼自然頻率 $\\omega_d = \\omega_n\\sqrt{1-\\zeta^2}$ 振盪（最常見控制系統） |\n| **臨界阻尼（Critically damped）** | $\\zeta = 1$ | 負實軸重根 $-\\omega_n, -\\omega_n$ | 無超越量且最快收斂：$x(t) = \\frac{1}{k}[1 - (1 + \\omega_n t)e^{-\\omega_n t}]$ |\n| **過阻尼（Over-damped）** | $\\zeta > 1$ | 兩個相異負實根 $-\\omega_n(\\zeta \\pm \\sqrt{\\zeta^2-1})$ | 兩個相異一階指數響應疊加，無振盪但反應較慢 |\n\n### 4. 標準二階系統暫態性能指標（Performance Indices, pp. 14–17）\n對於標準二階系統 $G(s) = \\frac{\\omega_n^2}{s^2 + 2\\zeta\\omega_n s + \\omega_n^2}$（$0 < \\zeta < 1$）：\n- **上升時間（Rise Time, $T_r$）**：輸出由穩態值的 10% 上升至 90% 所需時間（查圖 Fig. 3-7b）。\n- **峰值時間（Peak Time, $T_p$）**：到達第一個最高峰（$n=1$）的時間：\n  $$T_p = \\frac{\\pi}{\\omega_d} = \\frac{\\pi}{\\omega_n\\sqrt{1-\\zeta^2}} \\quad \\text{(3-26)}$$\n- **最大超越量（Percent Overshoot, $\\%OS$）**：僅由阻尼比 $\\zeta$ 唯一決定：\n  $$\\%OS = \\frac{M}{x_{ss}} = e^{-\\frac{\\pi\\zeta}{\\sqrt{1-\\zeta^2}}} \\times 100\\% \\quad \\text{(3-25)}$$\n- **2% 安定時間（Settling Time, $T_s$）**：進入並維持在穩態值 $\\pm 2\\%$ 誤差帶內的時間：\n  $$T_s \\approx \\frac{4}{\\zeta\\omega_n} \\quad \\text{(3-24)}$$\n\n### 5. 零點效應、非最小相位與主導極點（pp. 17–20）\n- **左半平面零點（$s = -z, z > 0$）**：系統 $G(s) = \\frac{(\\omega_n^2/z)(s+z)}{s^2+2\\zeta\\omega_n s+\\omega_n^2} = \\frac{s}{z}G_{\\text{std}}(s) + G_{\\text{std}}(s)$，其步階響應為 $y(t) = c(t) + \\frac{1}{z}\\frac{dc(t)}{dt}$。當 $z$ 愈小（零點愈靠近虛軸），微分項權重愈大，導致**超越量 $\\%OS$ 顯著變大、上升變快**（Fig. 3-10）。\n- **右半平面零點（$z < 0$，非最小相位系統 Nonminimum Phase System）**：由於初始微分項符號相反，步階響應在起步時會先往反方向下掉，產生**下衝（Undershoot）**現象（Fig. 3-11）。\n- **主導極點（Dominant Poles, p. 19）**：一般高階系統可部分分式拆解為一階與二階系統之和（Eq. 3-30）。實部最靠近虛軸的極點衰減最慢，主宰整體暫態響應，稱為**主導極點**（若附加極點距離虛軸為主導極點的 5 倍以上，如 $-10 \\ll -2$，其影響可忽略）。\n\n## 關聯知識節點（Cross-References）\n- [[second-order-performance-indices|概念卡：二階系統暫態性能指標與極點幾何對應]]\n- [[effects-of-zeros-and-dominant-poles|概念卡：零點效應、非最小相位下衝與主導極點近似]]\n- [[ch04-stability|Chapter 4: 穩定度分析]]\n", "path": "wiki/chapters/ch03-system-dynamics-transient.md"}, {"id": "ch04-stability", "title": "Chapter 4: 穩定度分析與羅斯-赫維茲判據 (Stability)", "category": "chapter", "chapter": "Chapter 4", "source_pages": "pp. 21–26", "updated": "2026-11-14", "tags": ["BIBO穩定度", "絕對穩定度", "相對穩定度", "極點位置", "羅斯表", "Routh-Hurwitz"], "related": ["ch03-system-dynamics-transient", "routh-hurwitz-criterion", "ch06-root-locus", "ch07-frequency-response"], "body": "# Chapter 4: 穩定度分析與羅斯-赫維茲判據 (Stability)\n\n> **核心摘要**：穩定度是控制系統最重要的首要條件（若不穩定，討論暫態性能與穩態誤差皆無意義）。本章定義有界輸入有界輸出（BIBO）穩定度，推導極點在複數平面位置（LHP / RHP / 虛軸）與穩定度的充要關係，並提出無須直接求解高階多項式根即可判定穩定度的 **羅斯-赫維茲判據（Routh-Hurwitz Criterion）**。\n\n## 核心理論與數學推導\n\n### 1. BIBO 穩定度、絕對穩定度與相對穩定度（p. 21）\n- **BIBO 穩定度（Bounded-Input-Bounded-Output Stability）**：若系統對任何有界輸入（Bounded input）所產生的輸出皆為有界（Bounded output），則稱該系統為穩定。\n- **絕對穩定度（Absolute Stability）**：定性判斷系統為「穩定（Stable）」或「不穩定（Unstable）」。\n- **相對穩定度（Relative Stability）**：當系統穩定時，進一步衡量其穩定的程度（例如兩架在相同亂流下的飛機，振盪較小者具有較高的相對穩定度）。\n- **正迴授導致不穩定實例（麥克風嘯叫系統, Fig. 4-1）**：揚聲器輸出 $y(t)$ 經空氣衰減 $\\alpha$ 後傳回麥克風，與講者聲音 $x(t)$ 疊加並放大 $k$ 倍，得：\n  $$y(t) = \\frac{k}{1 - k\\alpha} x(t) \\quad \\text{(4-1)}$$\n  當麥克風靠近喇叭使 $\\alpha \\to \\frac{1}{k}$ 時，$y(t) \\to \\infty$ 產生刺耳嘯叫，展示不當迴授如何引發系統不穩定。\n\n### 2. 極點位置與系統穩定度總結（pp. 22–24）\n綜合一階、二階與一般高階系統的齊次解與特解分析，系統穩定度完全取決於轉移函數 $G(s) = \\frac{N(s)}{D(s)}$ 之**極點（即特徵多項式 $D(s)=0$ 之根）**在複數 $s$ 平面的位置：\n1. **穩定（Stable）**：所有極點皆嚴格位於**左半平面（LHP, $\\text{Re}(s) < 0$）**。此時齊次解 $y_h(t) \\to 0$，且對任何有界輸入其特解 $y_p(t)$ 皆有界。\n2. **不穩定（Unstable）**：滿足下列任一條件即為不穩定：\n   - **(a)** 至少有一個極點位於**右半平面（RHP, $\\text{Re}(s) > 0$）**（齊次解隨 $e^{\\alpha t}$ 指數發散）。\n   - **(b)** 在**虛軸（Imaginary axis, $\\text{Re}(s) = 0$）上有重根（Multiple poles）**（例如雙重積分器 $\\ddot{y} = u, G(s)=\\frac{1}{s^2}$，齊次解含 $c_1 t + c_2$ 隨時間無界發散）。\n3. **臨界穩定（Marginally Stable）**：虛軸上的極點皆為**單根（Isolated / Simple poles，無重根）**，且其餘極點皆位於左半平面（LHP）。此時對步階輸入有界，但若輸入頻率剛好等於虛軸極點自然頻率（如 $u = \\sin\\beta t$），特解會出現共振項 $-\\frac{k}{2\\beta}t\\cos\\beta t$ 而無界發散（Eq. 4-6）。\n\n### 3. 羅斯-赫維茲判據（Routh-Hurwitz Criterion, pp. 24–26）\n對於 $n$ 階特徵多項式 $D(s) = a_n s^n + a_{n-1}s^{n-1} + \\dots + a_1 s + a_0$（假設 $a_n > 0$）：\n- **必要條件（Necessary Condition）**：所有係數 $a_i > 0$（同號且無缺項）。若有任何係數 $\\le 0$，系統必定不穩定（或頂多臨界穩定）。\n- **充要條件（Necessary and Sufficient Condition）**：建立 **Routh 表（Routh Table）**，**系統穩定的充要條件為 Routh 表第一行（First Column）所有元素皆嚴格為正**；若第一行出現符號改變，**符號改變的次數即等於落在右半平面（RHP）的極點個數**。\n- **二階與三階系統快速公式（p. 25）**：\n  - 二階 $a_2 s^2 + a_1 s + a_0$：穩定 $\\iff a_2, a_1, a_0 > 0$。\n  - 三階 $a_3 s^3 + a_2 s^2 + a_1 s + a_0$：穩定 $\\iff a_i > 0$ 且 **$a_1 a_2 > a_0 a_3$**。\n\n## 典型例題與習題解析（pp. 25–26）\n\n1. **Exercise 1（閉迴路增益 $K$ 穩定範圍, p. 26）**：\n   - 受控體 $G(s) = \\frac{K(3s^2 + 2s)}{s^3 + 2s + 5}$ 採單位負迴授，特徵方程式為：\n     $$D(s) = (s^3 + 2s + 5) + K(3s^2 + 2s) = s^3 + 3Ks^2 + (2 + 2K)s + 5 = 0$$\n   - 套用三階 Routh 穩定充要條件：\n     1. 係數皆大於 0：$3K > 0 \\implies K > 0$，且 $2+2K > 0 \\implies K > -1$。\n     2. $a_2 a_1 > a_3 a_0 \\implies 3K(2 + 2K) > 1 \\times 5 \\implies 6K^2 + 6K - 5 > 0$。\n     3. 解二次不等式得正根 $K > \\frac{-6 + \\sqrt{36 - 4(6)(-5)}}{12} = \\frac{-3 + \\sqrt{39}}{6} \\approx 0.5408$。\n2. **Exercise 2（五階系統 Routh 表穩定度判別, p. 26）**：\n   - 特徵方程式：$D(s) = s^5 + 3s^4 + 5s^3 + 2s^2 + 11s + 15 = 0$。\n   - 建立 Routh 表：\n     - $s^5$: $1, \\quad 5, \\quad 11$\n     - $s^4$: $3, \\quad 2, \\quad 15$\n     - $s^3$: $b_1 = \\frac{3(5)-1(2)}{3} = \\frac{13}{3} \\approx 4.333$, $\\quad b_2 = \\frac{3(11)-1(15)}{3} = 6$\n     - $s^2$: $c_1 = \\frac{\\frac{13}{3}(2) - 3(6)}{13/3} = \\frac{26/3 - 18}{13/3} = -\\frac{28}{13} \\approx -2.154$, $\\quad c_2 = 15$\n     - $s^1$: $d_1 = \\frac{(-\\frac{28}{13})(6) - (\\frac{13}{3})(15)}{-28/13} = 6 + \\frac{65 \\times 13}{28} \\approx +36.18 > 0$\n     - $s^0$: $15$\n   - 第一行符號依序為 $(+, +, +, -, +, +)$，共發生 **2 次符號改變**（由 $+\\frac{13}{3} \\to -\\frac{28}{13}$ 及 $-\\frac{28}{13} \\to +36.18$），故系統**不穩定**，且有 **2 個右半平面（RHP）極點**。\n\n## 關聯知識節點（Cross-References）\n- [[routh-hurwitz-criterion|概念卡：羅斯-赫維茲判據與兩大特殊情況處理（首項為零 / 整列為零）]]\n- [[ch03-system-dynamics-transient|Chapter 3: 系統動態與暫態性能]]\n- [[ch06-root-locus|Chapter 6: 根軌跡法（Rule 8 虛軸交點計算）]]", "raw": "---\nid: ch04-stability\ntitle: \"Chapter 4: 穩定度分析與羅斯-赫維茲判據 (Stability)\"\ncategory: chapter\nchapter: \"Chapter 4\"\nsource_pages: \"pp. 21–26\"\nupdated: 2026-11-14\ntags: [BIBO穩定度, 絕對穩定度, 相對穩定度, 極點位置, 羅斯表, Routh-Hurwitz]\nrelated: [ch03-system-dynamics-transient, routh-hurwitz-criterion, ch06-root-locus, ch07-frequency-response]\n---\n\n# Chapter 4: 穩定度分析與羅斯-赫維茲判據 (Stability)\n\n> **核心摘要**：穩定度是控制系統最重要的首要條件（若不穩定，討論暫態性能與穩態誤差皆無意義）。本章定義有界輸入有界輸出（BIBO）穩定度，推導極點在複數平面位置（LHP / RHP / 虛軸）與穩定度的充要關係，並提出無須直接求解高階多項式根即可判定穩定度的 **羅斯-赫維茲判據（Routh-Hurwitz Criterion）**。\n\n## 核心理論與數學推導\n\n### 1. BIBO 穩定度、絕對穩定度與相對穩定度（p. 21）\n- **BIBO 穩定度（Bounded-Input-Bounded-Output Stability）**：若系統對任何有界輸入（Bounded input）所產生的輸出皆為有界（Bounded output），則稱該系統為穩定。\n- **絕對穩定度（Absolute Stability）**：定性判斷系統為「穩定（Stable）」或「不穩定（Unstable）」。\n- **相對穩定度（Relative Stability）**：當系統穩定時，進一步衡量其穩定的程度（例如兩架在相同亂流下的飛機，振盪較小者具有較高的相對穩定度）。\n- **正迴授導致不穩定實例（麥克風嘯叫系統, Fig. 4-1）**：揚聲器輸出 $y(t)$ 經空氣衰減 $\\alpha$ 後傳回麥克風，與講者聲音 $x(t)$ 疊加並放大 $k$ 倍，得：\n  $$y(t) = \\frac{k}{1 - k\\alpha} x(t) \\quad \\text{(4-1)}$$\n  當麥克風靠近喇叭使 $\\alpha \\to \\frac{1}{k}$ 時，$y(t) \\to \\infty$ 產生刺耳嘯叫，展示不當迴授如何引發系統不穩定。\n\n### 2. 極點位置與系統穩定度總結（pp. 22–24）\n綜合一階、二階與一般高階系統的齊次解與特解分析，系統穩定度完全取決於轉移函數 $G(s) = \\frac{N(s)}{D(s)}$ 之**極點（即特徵多項式 $D(s)=0$ 之根）**在複數 $s$ 平面的位置：\n1. **穩定（Stable）**：所有極點皆嚴格位於**左半平面（LHP, $\\text{Re}(s) < 0$）**。此時齊次解 $y_h(t) \\to 0$，且對任何有界輸入其特解 $y_p(t)$ 皆有界。\n2. **不穩定（Unstable）**：滿足下列任一條件即為不穩定：\n   - **(a)** 至少有一個極點位於**右半平面（RHP, $\\text{Re}(s) > 0$）**（齊次解隨 $e^{\\alpha t}$ 指數發散）。\n   - **(b)** 在**虛軸（Imaginary axis, $\\text{Re}(s) = 0$）上有重根（Multiple poles）**（例如雙重積分器 $\\ddot{y} = u, G(s)=\\frac{1}{s^2}$，齊次解含 $c_1 t + c_2$ 隨時間無界發散）。\n3. **臨界穩定（Marginally Stable）**：虛軸上的極點皆為**單根（Isolated / Simple poles，無重根）**，且其餘極點皆位於左半平面（LHP）。此時對步階輸入有界，但若輸入頻率剛好等於虛軸極點自然頻率（如 $u = \\sin\\beta t$），特解會出現共振項 $-\\frac{k}{2\\beta}t\\cos\\beta t$ 而無界發散（Eq. 4-6）。\n\n### 3. 羅斯-赫維茲判據（Routh-Hurwitz Criterion, pp. 24–26）\n對於 $n$ 階特徵多項式 $D(s) = a_n s^n + a_{n-1}s^{n-1} + \\dots + a_1 s + a_0$（假設 $a_n > 0$）：\n- **必要條件（Necessary Condition）**：所有係數 $a_i > 0$（同號且無缺項）。若有任何係數 $\\le 0$，系統必定不穩定（或頂多臨界穩定）。\n- **充要條件（Necessary and Sufficient Condition）**：建立 **Routh 表（Routh Table）**，**系統穩定的充要條件為 Routh 表第一行（First Column）所有元素皆嚴格為正**；若第一行出現符號改變，**符號改變的次數即等於落在右半平面（RHP）的極點個數**。\n- **二階與三階系統快速公式（p. 25）**：\n  - 二階 $a_2 s^2 + a_1 s + a_0$：穩定 $\\iff a_2, a_1, a_0 > 0$。\n  - 三階 $a_3 s^3 + a_2 s^2 + a_1 s + a_0$：穩定 $\\iff a_i > 0$ 且 **$a_1 a_2 > a_0 a_3$**。\n\n## 典型例題與習題解析（pp. 25–26）\n\n1. **Exercise 1（閉迴路增益 $K$ 穩定範圍, p. 26）**：\n   - 受控體 $G(s) = \\frac{K(3s^2 + 2s)}{s^3 + 2s + 5}$ 採單位負迴授，特徵方程式為：\n     $$D(s) = (s^3 + 2s + 5) + K(3s^2 + 2s) = s^3 + 3Ks^2 + (2 + 2K)s + 5 = 0$$\n   - 套用三階 Routh 穩定充要條件：\n     1. 係數皆大於 0：$3K > 0 \\implies K > 0$，且 $2+2K > 0 \\implies K > -1$。\n     2. $a_2 a_1 > a_3 a_0 \\implies 3K(2 + 2K) > 1 \\times 5 \\implies 6K^2 + 6K - 5 > 0$。\n     3. 解二次不等式得正根 $K > \\frac{-6 + \\sqrt{36 - 4(6)(-5)}}{12} = \\frac{-3 + \\sqrt{39}}{6} \\approx 0.5408$。\n2. **Exercise 2（五階系統 Routh 表穩定度判別, p. 26）**：\n   - 特徵方程式：$D(s) = s^5 + 3s^4 + 5s^3 + 2s^2 + 11s + 15 = 0$。\n   - 建立 Routh 表：\n     - $s^5$: $1, \\quad 5, \\quad 11$\n     - $s^4$: $3, \\quad 2, \\quad 15$\n     - $s^3$: $b_1 = \\frac{3(5)-1(2)}{3} = \\frac{13}{3} \\approx 4.333$, $\\quad b_2 = \\frac{3(11)-1(15)}{3} = 6$\n     - $s^2$: $c_1 = \\frac{\\frac{13}{3}(2) - 3(6)}{13/3} = \\frac{26/3 - 18}{13/3} = -\\frac{28}{13} \\approx -2.154$, $\\quad c_2 = 15$\n     - $s^1$: $d_1 = \\frac{(-\\frac{28}{13})(6) - (\\frac{13}{3})(15)}{-28/13} = 6 + \\frac{65 \\times 13}{28} \\approx +36.18 > 0$\n     - $s^0$: $15$\n   - 第一行符號依序為 $(+, +, +, -, +, +)$，共發生 **2 次符號改變**（由 $+\\frac{13}{3} \\to -\\frac{28}{13}$ 及 $-\\frac{28}{13} \\to +36.18$），故系統**不穩定**，且有 **2 個右半平面（RHP）極點**。\n\n## 關聯知識節點（Cross-References）\n- [[routh-hurwitz-criterion|概念卡：羅斯-赫維茲判據與兩大特殊情況處理（首項為零 / 整列為零）]]\n- [[ch03-system-dynamics-transient|Chapter 3: 系統動態與暫態性能]]\n- [[ch06-root-locus|Chapter 6: 根軌跡法（Rule 8 虛軸交點計算）]]\n", "path": "wiki/chapters/ch04-stability.md"}, {"id": "ch05-steady-state-error", "title": "Chapter 5: 穩態誤差與系統型別 (Steady-State Errors)", "category": "chapter", "chapter": "Chapter 5", "source_pages": "pp. 27–32", "updated": "2026-11-14", "tags": ["穩態誤差", "測試信號", "誤差常數", "系統型別", "Type Number", "PI控制器"], "related": ["ch01-introduction", "system-type-and-error-constants", "ch06-root-locus", "ch07-frequency-response"], "body": "# Chapter 5: 穩態誤差與系統型別 (Steady-State Errors)\n\n> **核心摘要**：本章定義追蹤誤差 $e(t) = r(t) - y(t)$ 與穩態誤差 $e_{ss} = \\lim_{t\\to\\infty} e(t)$，引入步階、斜坡與拋物線三大標準測試信號，推導單位負迴授系統的三大誤差常數（$K_p, K_v, K_a$）與系統型別（Type 0, Type 1, Type 2）的對應法則，並透過 PI 控制器實例說明「穩態精度」與「暫態超越量」之間的工程權衡（Trade-off）。\n\n## 核心理論與數學推導\n\n### 1. 三大標準測試信號（Standard Test Signals, pp. 27–28, Fig. 5-1 ~ 5-3）\n任意參考命令 $r(t)$ 可分別用零階（步階）、一階（斜坡）與二階（拋物線）函數近似，因此定義三種標準測試輸入（$t > 0$）：\n1. **步階輸入（Step Input，定位置命令）**：$u(t) = A \\implies R(s) = \\frac{A}{s}$ (5-3)\n2. **斜坡輸入（Ramp Input，定速度命令）**：$v(t) = At \\implies R(s) = \\frac{A}{s^2}$ (5-4)\n3. **拋物線輸入（Acceleration Input，定加速度命令）**：$a(t) = 0.5At^2 \\implies R(s) = \\frac{A}{s^3}$ (5-5)\n\n### 2. 迴授大幅降低穩態誤差之實例（pp. 28–29, Fig. 5-4）\n考慮進給驅動速度控制系統，忽略極快極點 $(s+1000)$ 並經單位換算後，轉移函數為 $G(s) = \\frac{100}{s+20}$ (5-10)：\n- **開迴路系統（Open-loop）**：對單位步階輸入，$e_{ss} = 1 - G(0) = 1 - \\frac{100}{20} = -4$（誤差高達 400%）。\n- **單位負迴授閉迴路系統（Unity Negative Feedback）**：誤差轉移函數 $E(s) = \\frac{1}{1+G(s)}R(s)$，由終值定理得：\n  $$e_{ss} = \\lim_{s\\to 0} s \\frac{1}{1+G(s)}\\frac{1}{s} = \\frac{1}{1+G(0)} = \\frac{1}{1+5} = \\frac{1}{6} \\approx 0.167$$\n  證明負迴授能有效大幅壓低穩態誤差。\n\n### 3. 三大靜態誤差常數與系統型別（Error Constants & System Type, pp. 29–31）\n對於單位負迴授系統，設開迴路（迴路）轉移函數為：\n$$G(s) = \\frac{K(s+z_1)(s+z_2)\\cdots(s+z_M)}{s^N (s+p_1)(s+p_2)\\cdots(s+p_Q)} \\quad \\text{(5-11)}$$\n其中在原點 $s=0$ 的極點重數 $N$（即純積分器個數）定義為系統的 **型別數（Type Number, Type $N$）**。\n\n- **位置誤差常數（Position Error Constant）**：$K_p = \\lim_{s\\to 0} G(s)$，步階穩態誤差 $e_{ss} = \\frac{A}{1 + K_p}$。\n- **速度誤差常數（Velocity Error Constant）**：$K_v = \\lim_{s\\to 0} sG(s)$，斜坡穩態誤差 $e_{ss} = \\frac{A}{K_v}$。\n- **加速度誤差常數（Acceleration Error Constant）**：$K_a = \\lim_{s\\to 0} s^2 G(s)$，拋物線穩態誤差 $e_{ss} = \\frac{A}{K_a}$。\n\n| 系統型別 | 誤差常數特性 | 步階輸入 $r(t)=A$ | 斜坡輸入 $r(t)=At$ | 拋物線輸入 $r(t)=0.5At^2$ |\n| :--- | :--- | :--- | :--- | :--- |\n| **Type 0 ($N=0$)** | $|K_p| < \\infty, \\; K_v = K_a = 0$ | $e_{ss} = \\frac{A}{1+K_p}$（有限常數） | $e_{ss} = \\infty$ | $e_{ss} = \\infty$ |\n| **Type 1 ($N=1$)** | $K_p = \\infty, \\; |K_v| < \\infty, \\; K_a = 0$ | $e_{ss} = 0$ | $e_{ss} = \\frac{A}{K_v}$（有限常數） | $e_{ss} = \\infty$ |\n| **Type 2 ($N=2$)** | $K_p = K_v = \\infty, \\; |K_a| < \\infty$ | $e_{ss} = 0$ | $e_{ss} = 0$ | $e_{ss} = \\frac{A}{K_a}$（有限常數） |\n\n> **非單位迴授系統（Non-unity Feedback, p. 31, Fig. 5-5）**：當迴授通道為 $H(s) \\neq 1$ 時，通常源於輸入與輸出物理單位不同；只要先做好單位轉換使輸入與輸出同單位，即可化為單位負迴授結構，或將迴路轉移函數改以 $G(s)H(s)$ 代入分析。\n\n### 4. 暫態性能與穩態精度的衝突：PI 控制器實例（pp. 31–32, Fig. 5-6）\n考慮受控體 $G(s) = \\frac{K}{\\tau s + 1}$ 搭配比例-積分（PI）控制器 $G_1(s) = K_1 + \\frac{K_2}{s}$：\n- 加入積分控制（$K_2 \\neq 0$）使系統由 Type 0 提升為 **Type 1**，因此 $K_p = \\infty$（步階穩態誤差歸零），且速度誤差常數為：\n  $$K_v = \\lim_{s\\to 0} s G_1(s)G(s) = K_2 K \\quad \\text{(5-12)}$$\n- 閉迴路轉移函數為 $G_c(s) = \\frac{K_1 K s + K_2 K}{\\tau s^2 + (1 + K_1 K)s + K_2 K}$，其等效阻尼比平方為：\n  $$\\zeta^2 = \\frac{(1 + K_1 K)^2}{4\\tau K_2 K} \\quad \\text{(5-13)}$$\n- **工程設計權衡（Trade-off）**：由 (5-12) 與 (5-13) 可見，若為了提高動態穩態精度而調大積分增益 $K_2$（使 $K_v$ 變大），會直接導致阻尼比 $\\zeta$ 下降，進而使暫態超越量 $\\%OS$ 惡化變大！\n\n## 關聯知識節點（Cross-References）\n- [[system-type-and-error-constants|概念卡：系統型別（Type N）與穩態誤差常數完整對照表]]\n- [[ch06-root-locus|Chapter 6: 根軌跡法]]\n- [[ch07-frequency-response|Chapter 7: 頻率響應法（由波德圖低頻漸近線求 Kp, Kv, Ka）]]", "raw": "---\nid: ch05-steady-state-error\ntitle: \"Chapter 5: 穩態誤差與系統型別 (Steady-State Errors)\"\ncategory: chapter\nchapter: \"Chapter 5\"\nsource_pages: \"pp. 27–32\"\nupdated: 2026-11-14\ntags: [穩態誤差, 測試信號, 誤差常數, 系統型別, Type Number, PI控制器]\nrelated: [ch01-introduction, system-type-and-error-constants, ch06-root-locus, ch07-frequency-response]\n---\n\n# Chapter 5: 穩態誤差與系統型別 (Steady-State Errors)\n\n> **核心摘要**：本章定義追蹤誤差 $e(t) = r(t) - y(t)$ 與穩態誤差 $e_{ss} = \\lim_{t\\to\\infty} e(t)$，引入步階、斜坡與拋物線三大標準測試信號，推導單位負迴授系統的三大誤差常數（$K_p, K_v, K_a$）與系統型別（Type 0, Type 1, Type 2）的對應法則，並透過 PI 控制器實例說明「穩態精度」與「暫態超越量」之間的工程權衡（Trade-off）。\n\n## 核心理論與數學推導\n\n### 1. 三大標準測試信號（Standard Test Signals, pp. 27–28, Fig. 5-1 ~ 5-3）\n任意參考命令 $r(t)$ 可分別用零階（步階）、一階（斜坡）與二階（拋物線）函數近似，因此定義三種標準測試輸入（$t > 0$）：\n1. **步階輸入（Step Input，定位置命令）**：$u(t) = A \\implies R(s) = \\frac{A}{s}$ (5-3)\n2. **斜坡輸入（Ramp Input，定速度命令）**：$v(t) = At \\implies R(s) = \\frac{A}{s^2}$ (5-4)\n3. **拋物線輸入（Acceleration Input，定加速度命令）**：$a(t) = 0.5At^2 \\implies R(s) = \\frac{A}{s^3}$ (5-5)\n\n### 2. 迴授大幅降低穩態誤差之實例（pp. 28–29, Fig. 5-4）\n考慮進給驅動速度控制系統，忽略極快極點 $(s+1000)$ 並經單位換算後，轉移函數為 $G(s) = \\frac{100}{s+20}$ (5-10)：\n- **開迴路系統（Open-loop）**：對單位步階輸入，$e_{ss} = 1 - G(0) = 1 - \\frac{100}{20} = -4$（誤差高達 400%）。\n- **單位負迴授閉迴路系統（Unity Negative Feedback）**：誤差轉移函數 $E(s) = \\frac{1}{1+G(s)}R(s)$，由終值定理得：\n  $$e_{ss} = \\lim_{s\\to 0} s \\frac{1}{1+G(s)}\\frac{1}{s} = \\frac{1}{1+G(0)} = \\frac{1}{1+5} = \\frac{1}{6} \\approx 0.167$$\n  證明負迴授能有效大幅壓低穩態誤差。\n\n### 3. 三大靜態誤差常數與系統型別（Error Constants & System Type, pp. 29–31）\n對於單位負迴授系統，設開迴路（迴路）轉移函數為：\n$$G(s) = \\frac{K(s+z_1)(s+z_2)\\cdots(s+z_M)}{s^N (s+p_1)(s+p_2)\\cdots(s+p_Q)} \\quad \\text{(5-11)}$$\n其中在原點 $s=0$ 的極點重數 $N$（即純積分器個數）定義為系統的 **型別數（Type Number, Type $N$）**。\n\n- **位置誤差常數（Position Error Constant）**：$K_p = \\lim_{s\\to 0} G(s)$，步階穩態誤差 $e_{ss} = \\frac{A}{1 + K_p}$。\n- **速度誤差常數（Velocity Error Constant）**：$K_v = \\lim_{s\\to 0} sG(s)$，斜坡穩態誤差 $e_{ss} = \\frac{A}{K_v}$。\n- **加速度誤差常數（Acceleration Error Constant）**：$K_a = \\lim_{s\\to 0} s^2 G(s)$，拋物線穩態誤差 $e_{ss} = \\frac{A}{K_a}$。\n\n| 系統型別 | 誤差常數特性 | 步階輸入 $r(t)=A$ | 斜坡輸入 $r(t)=At$ | 拋物線輸入 $r(t)=0.5At^2$ |\n| :--- | :--- | :--- | :--- | :--- |\n| **Type 0 ($N=0$)** | $|K_p| < \\infty, \\; K_v = K_a = 0$ | $e_{ss} = \\frac{A}{1+K_p}$（有限常數） | $e_{ss} = \\infty$ | $e_{ss} = \\infty$ |\n| **Type 1 ($N=1$)** | $K_p = \\infty, \\; |K_v| < \\infty, \\; K_a = 0$ | $e_{ss} = 0$ | $e_{ss} = \\frac{A}{K_v}$（有限常數） | $e_{ss} = \\infty$ |\n| **Type 2 ($N=2$)** | $K_p = K_v = \\infty, \\; |K_a| < \\infty$ | $e_{ss} = 0$ | $e_{ss} = 0$ | $e_{ss} = \\frac{A}{K_a}$（有限常數） |\n\n> **非單位迴授系統（Non-unity Feedback, p. 31, Fig. 5-5）**：當迴授通道為 $H(s) \\neq 1$ 時，通常源於輸入與輸出物理單位不同；只要先做好單位轉換使輸入與輸出同單位，即可化為單位負迴授結構，或將迴路轉移函數改以 $G(s)H(s)$ 代入分析。\n\n### 4. 暫態性能與穩態精度的衝突：PI 控制器實例（pp. 31–32, Fig. 5-6）\n考慮受控體 $G(s) = \\frac{K}{\\tau s + 1}$ 搭配比例-積分（PI）控制器 $G_1(s) = K_1 + \\frac{K_2}{s}$：\n- 加入積分控制（$K_2 \\neq 0$）使系統由 Type 0 提升為 **Type 1**，因此 $K_p = \\infty$（步階穩態誤差歸零），且速度誤差常數為：\n  $$K_v = \\lim_{s\\to 0} s G_1(s)G(s) = K_2 K \\quad \\text{(5-12)}$$\n- 閉迴路轉移函數為 $G_c(s) = \\frac{K_1 K s + K_2 K}{\\tau s^2 + (1 + K_1 K)s + K_2 K}$，其等效阻尼比平方為：\n  $$\\zeta^2 = \\frac{(1 + K_1 K)^2}{4\\tau K_2 K} \\quad \\text{(5-13)}$$\n- **工程設計權衡（Trade-off）**：由 (5-12) 與 (5-13) 可見，若為了提高動態穩態精度而調大積分增益 $K_2$（使 $K_v$ 變大），會直接導致阻尼比 $\\zeta$ 下降，進而使暫態超越量 $\\%OS$ 惡化變大！\n\n## 關聯知識節點（Cross-References）\n- [[system-type-and-error-constants|概念卡：系統型別（Type N）與穩態誤差常數完整對照表]]\n- [[ch06-root-locus|Chapter 6: 根軌跡法]]\n- [[ch07-frequency-response|Chapter 7: 頻率響應法（由波德圖低頻漸近線求 Kp, Kv, Ka）]]\n", "path": "wiki/chapters/ch05-steady-state-error.md"}, {"id": "ch06-root-locus", "title": "Chapter 6: 根軌跡法控制器設計 (Root Locus Technique)", "category": "chapter", "chapter": "Chapter 6", "source_pages": "pp. 33–36", "updated": "2026-11-14", "tags": ["根軌跡", "Root Locus", "PID控制器", "相角條件", "大小條件", "漸近線", "分離點"], "related": ["ch03-system-dynamics-transient", "ch04-stability", "root-locus-construction-rules", "ch07-frequency-response"], "body": "# Chapter 6: 根軌跡法控制器設計 (Root Locus Technique)\n\n> **核心摘要**：由於閉迴路系統的穩定度與暫態性能完全取決於閉迴路極點位置，伊凡斯（W. R. Evans）提出的**根軌跡法（Root Locus Technique）**透過繪製「當控制器增益 $K$ 由 $0$ 變化至 $\\infty$ 時，所有可能閉迴路極點在複數平面上的軌跡曲線」，讓工程師能直觀選擇滿足性能規格的極點區域並反求增益 $K$。\n\n## 核心理論與數學推導\n\n### 1. 控制器架構與根軌跡定義（pp. 33–34, Fig. 6-1 ~ 6-3）\n- **PID 控制器標準型式**：\n  $$G_c(s) = K_1 + \\frac{K_2}{s} + K_3 s \\quad \\text{(6-1)}$$\n  其中 $K_1, K_2, K_3$ 分別為比例（P）、積分（I）、微分（D）增益。\n- **單一可調增益架構**：將控制器寫為 $G_c(s) = K \\hat{G}_c(s)$ (6-2)，定義已知開迴路轉移函數 $G(s) = \\hat{G}_c(s)G_p(s) = \\frac{N(s)}{D(s)}$ (6-3, 6-5)，則單位負迴授閉迴路轉移函數為：\n  $$T(s) = \\frac{KG(s)}{1 + KG(s)} = \\frac{KN(s)}{D(s) + KN(s)} \\quad \\text{(6-4, 6-6)}$$\n  **重要性質**：閉迴路系統的零點與開迴路零點 $N(s)=0$ 完全相同（**負迴授不會改變開迴路零點！**），但閉迴路極點會隨增益 $K$ 改變。\n- **二階根軌跡入門範例（p. 34, Fig. 6-3）**：設 $G(s) = \\frac{1}{s(s+2)}$，則 $T(s) = \\frac{K}{s^2+2s+K}$，閉迴路極點為 $s = -1 \\pm \\sqrt{1-K}$。當 $0 \\le K \\le 1$ 時兩極點在實軸 $[-2, 0]$ 間相向移動並於 $s=-1$ 會合；當 $K > 1$ 時分離進入複數平面，沿直線 $s = -1 \\pm j\\sqrt{K-1}$ 往上下無限遠延伸。\n\n### 2. 大小條件與相角條件（Magnitude & Angle Conditions, p. 35）\n閉迴路極點滿足特徵方程式 $1 + KG(s) = 0 \\iff D(s) + KN(s) = 0$ (6-7, 6-10)，在 $0 \\le K < \\infty$ 下等價於：\n1. **大小條件（Magnitude Condition）**：\n   $$|KG(s)| = 1 \\implies K = \\frac{1}{|G(s)|} = \\frac{|D(s)|}{|N(s)|} \\quad \\text{(6-8)}$$\n2. **相角條件（Angle Condition）**：決定複數平面上某點 $s$ 是否位於根軌跡上的充要判據：\n   $$\\angle G(s) = \\angle \\frac{(s+z_1)\\cdots(s+z_M)}{(s+p_1)\\cdots(s+p_n)} = \\sum_{j=1}^M \\angle(s+z_j) - \\sum_{i=1}^n \\angle(s+p_i) = 180^\\circ \\pm m 360^\\circ \\quad \\text{(6-9, 6-11)}$$\n\n### 3. 根軌跡繪製九大法則概覽（Nine Construction Rules, pp. 35–36）\n- **Rule 1（分支數）**：共有 $n = \\deg D(s)$ 條根軌跡分支。\n- **Rule 2（對稱性）**：根軌跡必對稱於實軸（因實係數多項式之複數根必共軛成對）。\n- **Rule 3（起點與終點）**：每一分支於 $K=0$ 時起自開迴路極點（$-p_i$），於 $K\\to\\infty$ 時終止於開迴路有限零點（$-z_j$）；若 $M < n$，則有 $n-M$ 條分支趨向無限遠（$\\infty$）。\n- **Rule 4（漸近線重心與角度）**：趨向無限遠的 $n-M$ 條分支沿漸近線發散，其與實軸交點（重心 $\\sigma_A$）與夾角 $\\Phi_A$ 為：\n  $$\\sigma_A = \\frac{\\sum(-p_i) - \\sum(-z_j)}{n - M}, \\quad \\Phi_A = \\frac{2q+1}{n-M}180^\\circ, \\; q = 0, 1, \\dots, (n-M-1) \\quad \\text{(6-12, 6-13)}$$\n- **Rule 5（實軸軌跡區間）**：實軸上某點屬於根軌跡，若且唯若該點**右側**的實數開迴路極點與零點總數為**奇數（Odd number）**。\n- **Rule 6（分離點與會合點 Breakaway / Break-in Points）**：滿足重根條件，聯立求解 $D(s) + KN(s) = 0$ 與 $D'(s) + KN'(s) = 0$（即 $\\frac{dK}{ds} = -\\frac{d}{ds}\\left[\\frac{D(s)}{N(s)}\\right] = 0$）。\n- **Rule 7（離開角與進入角）**：利用極小圓周包圍複數極點或零點，套用相角條件 (6-11) 求得。\n- **Rule 8（與虛軸交點）**：利用 [[routh-hurwitz-criterion|Routh-Hurwitz 判據]] 找出使系統達到臨界穩定的增益 $K$ 與振盪頻率 $\\omega$。\n- **Rule 9（由選定極點反求增益 $K$ 與穩態誤差）**：選定滿足性能規格的閉迴路極點 $s^*$ 後，由 $K = \\frac{-D(s^*)}{N(s^*)}$ 求得增益，再代入 $K_p, K_v, K_a$ 檢驗穩態誤差。\n\n## 關聯知識節點（Cross-References）\n- [[root-locus-construction-rules|概念卡：根軌跡九大繪製法則完整公式與解題SOP]]\n- [[routh-hurwitz-criterion|概念卡：羅斯-赫維茲判據]]\n- [[ch07-frequency-response|Chapter 7: 頻率響應法]]", "raw": "---\nid: ch06-root-locus\ntitle: \"Chapter 6: 根軌跡法控制器設計 (Root Locus Technique)\"\ncategory: chapter\nchapter: \"Chapter 6\"\nsource_pages: \"pp. 33–36\"\nupdated: 2026-11-14\ntags: [根軌跡, Root Locus, PID控制器, 相角條件, 大小條件, 漸近線, 分離點]\nrelated: [ch03-system-dynamics-transient, ch04-stability, root-locus-construction-rules, ch07-frequency-response]\n---\n\n# Chapter 6: 根軌跡法控制器設計 (Root Locus Technique)\n\n> **核心摘要**：由於閉迴路系統的穩定度與暫態性能完全取決於閉迴路極點位置，伊凡斯（W. R. Evans）提出的**根軌跡法（Root Locus Technique）**透過繪製「當控制器增益 $K$ 由 $0$ 變化至 $\\infty$ 時，所有可能閉迴路極點在複數平面上的軌跡曲線」，讓工程師能直觀選擇滿足性能規格的極點區域並反求增益 $K$。\n\n## 核心理論與數學推導\n\n### 1. 控制器架構與根軌跡定義（pp. 33–34, Fig. 6-1 ~ 6-3）\n- **PID 控制器標準型式**：\n  $$G_c(s) = K_1 + \\frac{K_2}{s} + K_3 s \\quad \\text{(6-1)}$$\n  其中 $K_1, K_2, K_3$ 分別為比例（P）、積分（I）、微分（D）增益。\n- **單一可調增益架構**：將控制器寫為 $G_c(s) = K \\hat{G}_c(s)$ (6-2)，定義已知開迴路轉移函數 $G(s) = \\hat{G}_c(s)G_p(s) = \\frac{N(s)}{D(s)}$ (6-3, 6-5)，則單位負迴授閉迴路轉移函數為：\n  $$T(s) = \\frac{KG(s)}{1 + KG(s)} = \\frac{KN(s)}{D(s) + KN(s)} \\quad \\text{(6-4, 6-6)}$$\n  **重要性質**：閉迴路系統的零點與開迴路零點 $N(s)=0$ 完全相同（**負迴授不會改變開迴路零點！**），但閉迴路極點會隨增益 $K$ 改變。\n- **二階根軌跡入門範例（p. 34, Fig. 6-3）**：設 $G(s) = \\frac{1}{s(s+2)}$，則 $T(s) = \\frac{K}{s^2+2s+K}$，閉迴路極點為 $s = -1 \\pm \\sqrt{1-K}$。當 $0 \\le K \\le 1$ 時兩極點在實軸 $[-2, 0]$ 間相向移動並於 $s=-1$ 會合；當 $K > 1$ 時分離進入複數平面，沿直線 $s = -1 \\pm j\\sqrt{K-1}$ 往上下無限遠延伸。\n\n### 2. 大小條件與相角條件（Magnitude & Angle Conditions, p. 35）\n閉迴路極點滿足特徵方程式 $1 + KG(s) = 0 \\iff D(s) + KN(s) = 0$ (6-7, 6-10)，在 $0 \\le K < \\infty$ 下等價於：\n1. **大小條件（Magnitude Condition）**：\n   $$|KG(s)| = 1 \\implies K = \\frac{1}{|G(s)|} = \\frac{|D(s)|}{|N(s)|} \\quad \\text{(6-8)}$$\n2. **相角條件（Angle Condition）**：決定複數平面上某點 $s$ 是否位於根軌跡上的充要判據：\n   $$\\angle G(s) = \\angle \\frac{(s+z_1)\\cdots(s+z_M)}{(s+p_1)\\cdots(s+p_n)} = \\sum_{j=1}^M \\angle(s+z_j) - \\sum_{i=1}^n \\angle(s+p_i) = 180^\\circ \\pm m 360^\\circ \\quad \\text{(6-9, 6-11)}$$\n\n### 3. 根軌跡繪製九大法則概覽（Nine Construction Rules, pp. 35–36）\n- **Rule 1（分支數）**：共有 $n = \\deg D(s)$ 條根軌跡分支。\n- **Rule 2（對稱性）**：根軌跡必對稱於實軸（因實係數多項式之複數根必共軛成對）。\n- **Rule 3（起點與終點）**：每一分支於 $K=0$ 時起自開迴路極點（$-p_i$），於 $K\\to\\infty$ 時終止於開迴路有限零點（$-z_j$）；若 $M < n$，則有 $n-M$ 條分支趨向無限遠（$\\infty$）。\n- **Rule 4（漸近線重心與角度）**：趨向無限遠的 $n-M$ 條分支沿漸近線發散，其與實軸交點（重心 $\\sigma_A$）與夾角 $\\Phi_A$ 為：\n  $$\\sigma_A = \\frac{\\sum(-p_i) - \\sum(-z_j)}{n - M}, \\quad \\Phi_A = \\frac{2q+1}{n-M}180^\\circ, \\; q = 0, 1, \\dots, (n-M-1) \\quad \\text{(6-12, 6-13)}$$\n- **Rule 5（實軸軌跡區間）**：實軸上某點屬於根軌跡，若且唯若該點**右側**的實數開迴路極點與零點總數為**奇數（Odd number）**。\n- **Rule 6（分離點與會合點 Breakaway / Break-in Points）**：滿足重根條件，聯立求解 $D(s) + KN(s) = 0$ 與 $D'(s) + KN'(s) = 0$（即 $\\frac{dK}{ds} = -\\frac{d}{ds}\\left[\\frac{D(s)}{N(s)}\\right] = 0$）。\n- **Rule 7（離開角與進入角）**：利用極小圓周包圍複數極點或零點，套用相角條件 (6-11) 求得。\n- **Rule 8（與虛軸交點）**：利用 [[routh-hurwitz-criterion|Routh-Hurwitz 判據]] 找出使系統達到臨界穩定的增益 $K$ 與振盪頻率 $\\omega$。\n- **Rule 9（由選定極點反求增益 $K$ 與穩態誤差）**：選定滿足性能規格的閉迴路極點 $s^*$ 後，由 $K = \\frac{-D(s^*)}{N(s^*)}$ 求得增益，再代入 $K_p, K_v, K_a$ 檢驗穩態誤差。\n\n## 關聯知識節點（Cross-References）\n- [[root-locus-construction-rules|概念卡：根軌跡九大繪製法則完整公式與解題SOP]]\n- [[routh-hurwitz-criterion|概念卡：羅斯-赫維茲判據]]\n- [[ch07-frequency-response|Chapter 7: 頻率響應法]]\n", "path": "wiki/chapters/ch06-root-locus.md"}, {"id": "ch07-frequency-response", "title": "Chapter 7: 頻率響應法、波德圖與奈奎斯特判據 (Frequency Response Method)", "category": "chapter", "chapter": "Chapter 7", "source_pages": "pp. 37–47", "updated": "2026-11-14", "tags": ["傅立葉轉換", "頻率響應", "波德圖", "Bode Plot", "轉折頻率", "頻寬", "增益邊限", "相位邊限", "奈奎斯特判據"], "related": ["ch03-system-dynamics-transient", "ch04-stability", "ch05-steady-state-error", "bode-plot-and-stability-margins"], "body": "# Chapter 7: 頻率響應法、波德圖與奈奎斯特判據 (Frequency Response Method)\n\n> **核心摘要**：本章建立信號與系統在頻域（Frequency Domain）的表徵方式，從傅立葉級數與轉換出發，證明線性非時變系統對正弦輸入的穩態響應即由 $G(j\\omega)$ 的大小 $|G(j\\omega)|$ 與相角 $\\angle G(j\\omega)$ 決定；進而介紹對數座標下的**波德圖（Bode Plot）漸近線繪製法**、**系統頻寬（Bandwidth）**、**增益邊限（GM）與相位邊限（PM）**、頻域穩態誤差判讀，以及判斷閉迴路絕對穩定度的**奈奎斯特判據（Nyquist Criterion）**。\n\n## 核心理論與數學推導\n\n### 1. 傅立葉級數、傅立葉轉換與系統頻率響應（pp. 37–40）\n- **週期信號之傅立葉級數（Fourier Series, p. 37）**：週期為 $T$ 的信號可展開為諧波正弦合成 $f(t) = \\sum_{n=0}^\\infty A_n \\cos(\\omega_n t - \\theta_n)$，其中 $\\omega_n = \\frac{2n\\pi}{T}$ (7-1, 7-2)。\n- **非週期信號之傅立葉轉換（Fourier Transform, p. 38）**：\n  $$F(j\\omega) = \\int_{-\\infty}^\\infty f(t)e^{-j\\omega t}dt, \\quad A(\\omega) = |F(j\\omega)|, \\; \\phi(\\omega) = \\angle F(j\\omega) \\quad \\text{(7-4)}$$\n  對於滿足零初始條件（$t \\le 0$ 時 $f(t)=0$）的信號，將拉氏轉換 $F(s)$ 中的 $s$ 直接代換為 $j\\omega$ 即得傅立葉轉換 $\\left.F(s)\\right|_{s=j\\omega} = F(j\\omega)$ (p. 40)。\n- **LTI 系統對正弦輸入的穩態響應（pp. 38–39, Fig. 7-3）**：\n  將正弦信號 $u(t) = a\\sin\\omega t$ 輸入穩定 LTI 系統 $G(s)$（例如 $G(s) = \\frac{k}{s+p}, p>0$），當暫態項 $ce^{-pt}$ 衰減完畢後，穩態輸出為同頻率正弦波：\n  $$y_{ss}(t) = A(\\omega) a \\sin(\\omega t + \\theta(\\omega)), \\quad \\text{其中 } A(\\omega) = |G(j\\omega)|, \\; \\theta(\\omega) = \\angle G(j\\omega) \\quad \\text{(7-7, 7-8)}$$\n\n### 2. 波德圖與漸近線近似法（Bode Plot Approximations, pp. 39–43）\n**波德圖（Bode Plot）**以對數頻率 $\\log_{10}\\omega$ 為橫軸，由兩張圖組成：\n1. **大小圖（Magnitude Plot）**：縱軸為分貝（Decibels, dB）$= 20\\log_{10}|G(j\\omega)|$。利用對數將乘除化為加減，使高階系統波德圖可直接由一階與二階子系統波德圖線性相加疊加而成（pp. 40–41）。\n2. **相位圖（Phase Plot）**：縱軸為相角 $\\angle G(j\\omega)$（單位：度 Degrees）。\n\n- **一階低通系統（RC 電路範例, p. 40）**：$G(s) = \\frac{1}{RCs + 1}$，**轉折頻率（Corner / Cut-off Frequency）**為 $\\omega_c = \\frac{1}{RC}$：\n  - 低頻漸近線（$\\omega \\ll \\frac{1}{RC}$）：$20\\log|G(j\\omega)| \\approx 0\\text{ dB}$，相角（$\\omega < \\frac{0.1}{RC}$）$\\approx 0^\\circ$。\n  - 高頻漸近線（$\\omega \\gg \\frac{1}{RC}$）：以 **$-20\\text{ dB/decade}$（每 10 倍頻下降 20 dB，或 $-6\\text{ dB/octave}$）** 斜率直線下降；相角於 $\\frac{0.1}{RC} \\sim \\frac{10}{RC}$ 間以 $-45^\\circ/\\text{decade}$ 下降至 $-90^\\circ$。\n- **綜合波德圖繪製範例（p. 42, Fig. 7-10）**：\n  $$G(s) = \\frac{s+3}{(s+2)(s^2+2s+25)}$$\n  - 三個轉折頻率分別為：一階極點 $\\omega = 2\\text{ rad/s}$、一階零點 $\\omega = 3\\text{ rad/s}$、二階共軛極點自然頻率 $\\omega_n = \\sqrt{25} = 5\\text{ rad/s}$。\n  - 低頻增益（$\\omega \\to 0$）：$|G(j0)| = \\frac{3}{2 \\times 25} = \\frac{3}{50} = 0.06 \\implies 20\\log_{10}(0.06) \\approx -24.4\\text{ dB}$（講義取約 $-25\\text{ dB}$ 水平線起跑）。\n  - 斜率變化：$\\omega=2$ 轉折為 $-20\\text{ dB/dec} \\to \\omega=3$（零點 $+20\\text{ dB/dec}$ 抵銷）恢復 $0\\text{ dB/dec}$ 水平線 $\\to \\omega=5$（二階極點）轉折為 **$-40\\text{ dB/dec}$**。\n\n### 3. 系統頻寬與最小相位系統（Bandwidth & Minimum-Phase, p. 43）\n- **頻寬（Bandwidth, $\\omega_{BW}$）**：振幅下降至低頻通帶振幅之 $\\frac{1}{\\sqrt{2}}$（即下降 **$3\\text{ dB}$**）時的頻率（Fig. 7-11）。對於一階系統 $G(s) = \\frac{1}{s+a}$，頻寬即為轉折頻率 $\\omega_{BW} = a$。\n- **最小相位 vs. 非最小相位系統**：比較 $G_1(s) = \\frac{s+z}{s+p}$（LHP 零點）與 $G_2(s) = \\frac{s-z}{s+p}$（RHP 零點），兩者的大小波德圖完全相同！但 $G_1(s)$ 的相角位移永遠小於 $90^\\circ$，而含右半平面零點的 $G_2(s)$ 相角位移高達 $0^\\circ \\sim 180^\\circ$，故稱 $G_1(s)$ 為**最小相位系統（Minimum-phase）**，$G_2(s)$ 為**非最小相位系統（Non-minimum phase）**。\n\n### 4. 增益邊限、相位邊限與時域性能關聯（GM, PM & Transient Performance, pp. 44–45）\n為避免開迴路 $G(j\\omega) = -1 = 1\\angle 180^\\circ$ 導致閉迴路 $T(j\\omega) = \\frac{G(j\\omega)}{1+G(j\\omega)} \\to \\infty$ 不穩定，定義兩個衡量 $G(j\\omega)$ 距離臨界點 $(-1, j0)$ 的相對穩定度指標（Fig. 7-12）：\n1. **增益邊限（Gain Margin, GM）**：設相位穿越頻率 $\\omega^*$ 滿足 $\\angle G(j\\omega^*) = 180^\\circ$，則：\n   $$GM = -20\\log_{10}|G(j\\omega^*)| \\quad (\\text{dB})$$\n2. **相位邊限（Phase Margin, PM 或 $\\phi_{pm}$）**：設增益穿越頻率（Gain-crossover frequency）$\\omega_g$ 滿足 $|G(j\\omega_g)| = 1$（即 $0\\text{ dB}$），則：\n   $$\\phi_{pm} = 180^\\circ + \\angle G(j\\omega_g) \\quad (\\text{或 } 180^\\circ - |\\angle G(j\\omega_g)|)$$\n3. **頻域與時域指標轉換公式（p. 45, Fig. 7-13）**：\n   - 相位邊限與阻尼比的線性近似（當 $\\zeta \\le 0.6$ 時極準確）：\n     $$\\phi_{pm} = \\tan^{-1}\\frac{2\\zeta}{\\sqrt{-2\\zeta^2 + \\sqrt{1+4\\zeta^4}}} \\implies \\zeta \\approx 0.01 \\phi_{pm} \\; (\\phi_{pm} \\text{ 以度為單位})$$\n   - 頻寬 $\\omega_{BW}$（常以 $\\omega_g$ 近似）與安定時間 $T_s$ 成反比：頻寬愈大，反應愈快、安定時間 $T_s$ 愈短。\n\n### 5. 頻域穩態誤差判讀與奈奎斯特穩定判據（pp. 45–47）\n- **由波德圖低頻段直接讀取系統型別與誤差常數（pp. 45–46, Fig. 7-14）**：\n  - 低頻段為 **水平線（$0\\text{ dB/dec}$）** $\\implies$ **Type 0 系統**，高度即為 $20\\log_{10} K_p$。\n  - 低頻段斜率為 **$-20\\text{ dB/dec}$** $\\implies$ **Type 1 系統**，該初始斜線（或其延長線）與 $0\\text{ dB}$ 橫軸交點頻率即為 $\\omega = K_v$。\n  - 低頻段斜率為 **$-40\\text{ dB/dec}$** $\\implies$ **Type 2 系統**，該初始斜線（或其延長線）與 $0\\text{ dB}$ 橫軸交點頻率為 $\\sqrt{K_a}$（即交點頻率平方等於 $K_a$）。\n- **奈奎斯特穩定判據（Nyquist Stability Criterion, pp. 46–47, Fig. 7-15 & 7-16）**：\n  將包圍整個右半平面（RHP）的順時針奈氏路徑映射至 $G(s)$ 平面形成 **奈奎斯特圖（Nyquist Plot）**。**閉迴路系統穩定的充要條件為：奈奎斯特圖逆時針（Counter-clockwise）包圍臨界點 $(-1, 0)$ 的圈數 $N$，恰好等於開迴路系統 $G(s)$ 位於右半平面（RHP）的不穩定極點個數！**（若開迴路本身穩定 $P=0$，則奈氏圖不可包圍 $(-1,0)$ 點）。\n\n## 關聯知識節點（Cross-References）\n- [[bode-plot-and-stability-margins|概念卡：波德圖漸近線速繪、增益/相位邊限與奈奎斯特判據]]\n- [[system-type-and-error-constants|概念卡：系統型別與誤差常數（時域與頻域雙重解析）]]\n- [[ch04-stability|Chapter 4: 穩定度分析]]", "raw": "---\nid: ch07-frequency-response\ntitle: \"Chapter 7: 頻率響應法、波德圖與奈奎斯特判據 (Frequency Response Method)\"\ncategory: chapter\nchapter: \"Chapter 7\"\nsource_pages: \"pp. 37–47\"\nupdated: 2026-11-14\ntags: [傅立葉轉換, 頻率響應, 波德圖, Bode Plot, 轉折頻率, 頻寬, 增益邊限, 相位邊限, 奈奎斯特判據]\nrelated: [ch03-system-dynamics-transient, ch04-stability, ch05-steady-state-error, bode-plot-and-stability-margins]\n---\n\n# Chapter 7: 頻率響應法、波德圖與奈奎斯特判據 (Frequency Response Method)\n\n> **核心摘要**：本章建立信號與系統在頻域（Frequency Domain）的表徵方式，從傅立葉級數與轉換出發，證明線性非時變系統對正弦輸入的穩態響應即由 $G(j\\omega)$ 的大小 $|G(j\\omega)|$ 與相角 $\\angle G(j\\omega)$ 決定；進而介紹對數座標下的**波德圖（Bode Plot）漸近線繪製法**、**系統頻寬（Bandwidth）**、**增益邊限（GM）與相位邊限（PM）**、頻域穩態誤差判讀，以及判斷閉迴路絕對穩定度的**奈奎斯特判據（Nyquist Criterion）**。\n\n## 核心理論與數學推導\n\n### 1. 傅立葉級數、傅立葉轉換與系統頻率響應（pp. 37–40）\n- **週期信號之傅立葉級數（Fourier Series, p. 37）**：週期為 $T$ 的信號可展開為諧波正弦合成 $f(t) = \\sum_{n=0}^\\infty A_n \\cos(\\omega_n t - \\theta_n)$，其中 $\\omega_n = \\frac{2n\\pi}{T}$ (7-1, 7-2)。\n- **非週期信號之傅立葉轉換（Fourier Transform, p. 38）**：\n  $$F(j\\omega) = \\int_{-\\infty}^\\infty f(t)e^{-j\\omega t}dt, \\quad A(\\omega) = |F(j\\omega)|, \\; \\phi(\\omega) = \\angle F(j\\omega) \\quad \\text{(7-4)}$$\n  對於滿足零初始條件（$t \\le 0$ 時 $f(t)=0$）的信號，將拉氏轉換 $F(s)$ 中的 $s$ 直接代換為 $j\\omega$ 即得傅立葉轉換 $\\left.F(s)\\right|_{s=j\\omega} = F(j\\omega)$ (p. 40)。\n- **LTI 系統對正弦輸入的穩態響應（pp. 38–39, Fig. 7-3）**：\n  將正弦信號 $u(t) = a\\sin\\omega t$ 輸入穩定 LTI 系統 $G(s)$（例如 $G(s) = \\frac{k}{s+p}, p>0$），當暫態項 $ce^{-pt}$ 衰減完畢後，穩態輸出為同頻率正弦波：\n  $$y_{ss}(t) = A(\\omega) a \\sin(\\omega t + \\theta(\\omega)), \\quad \\text{其中 } A(\\omega) = |G(j\\omega)|, \\; \\theta(\\omega) = \\angle G(j\\omega) \\quad \\text{(7-7, 7-8)}$$\n\n### 2. 波德圖與漸近線近似法（Bode Plot Approximations, pp. 39–43）\n**波德圖（Bode Plot）**以對數頻率 $\\log_{10}\\omega$ 為橫軸，由兩張圖組成：\n1. **大小圖（Magnitude Plot）**：縱軸為分貝（Decibels, dB）$= 20\\log_{10}|G(j\\omega)|$。利用對數將乘除化為加減，使高階系統波德圖可直接由一階與二階子系統波德圖線性相加疊加而成（pp. 40–41）。\n2. **相位圖（Phase Plot）**：縱軸為相角 $\\angle G(j\\omega)$（單位：度 Degrees）。\n\n- **一階低通系統（RC 電路範例, p. 40）**：$G(s) = \\frac{1}{RCs + 1}$，**轉折頻率（Corner / Cut-off Frequency）**為 $\\omega_c = \\frac{1}{RC}$：\n  - 低頻漸近線（$\\omega \\ll \\frac{1}{RC}$）：$20\\log|G(j\\omega)| \\approx 0\\text{ dB}$，相角（$\\omega < \\frac{0.1}{RC}$）$\\approx 0^\\circ$。\n  - 高頻漸近線（$\\omega \\gg \\frac{1}{RC}$）：以 **$-20\\text{ dB/decade}$（每 10 倍頻下降 20 dB，或 $-6\\text{ dB/octave}$）** 斜率直線下降；相角於 $\\frac{0.1}{RC} \\sim \\frac{10}{RC}$ 間以 $-45^\\circ/\\text{decade}$ 下降至 $-90^\\circ$。\n- **綜合波德圖繪製範例（p. 42, Fig. 7-10）**：\n  $$G(s) = \\frac{s+3}{(s+2)(s^2+2s+25)}$$\n  - 三個轉折頻率分別為：一階極點 $\\omega = 2\\text{ rad/s}$、一階零點 $\\omega = 3\\text{ rad/s}$、二階共軛極點自然頻率 $\\omega_n = \\sqrt{25} = 5\\text{ rad/s}$。\n  - 低頻增益（$\\omega \\to 0$）：$|G(j0)| = \\frac{3}{2 \\times 25} = \\frac{3}{50} = 0.06 \\implies 20\\log_{10}(0.06) \\approx -24.4\\text{ dB}$（講義取約 $-25\\text{ dB}$ 水平線起跑）。\n  - 斜率變化：$\\omega=2$ 轉折為 $-20\\text{ dB/dec} \\to \\omega=3$（零點 $+20\\text{ dB/dec}$ 抵銷）恢復 $0\\text{ dB/dec}$ 水平線 $\\to \\omega=5$（二階極點）轉折為 **$-40\\text{ dB/dec}$**。\n\n### 3. 系統頻寬與最小相位系統（Bandwidth & Minimum-Phase, p. 43）\n- **頻寬（Bandwidth, $\\omega_{BW}$）**：振幅下降至低頻通帶振幅之 $\\frac{1}{\\sqrt{2}}$（即下降 **$3\\text{ dB}$**）時的頻率（Fig. 7-11）。對於一階系統 $G(s) = \\frac{1}{s+a}$，頻寬即為轉折頻率 $\\omega_{BW} = a$。\n- **最小相位 vs. 非最小相位系統**：比較 $G_1(s) = \\frac{s+z}{s+p}$（LHP 零點）與 $G_2(s) = \\frac{s-z}{s+p}$（RHP 零點），兩者的大小波德圖完全相同！但 $G_1(s)$ 的相角位移永遠小於 $90^\\circ$，而含右半平面零點的 $G_2(s)$ 相角位移高達 $0^\\circ \\sim 180^\\circ$，故稱 $G_1(s)$ 為**最小相位系統（Minimum-phase）**，$G_2(s)$ 為**非最小相位系統（Non-minimum phase）**。\n\n### 4. 增益邊限、相位邊限與時域性能關聯（GM, PM & Transient Performance, pp. 44–45）\n為避免開迴路 $G(j\\omega) = -1 = 1\\angle 180^\\circ$ 導致閉迴路 $T(j\\omega) = \\frac{G(j\\omega)}{1+G(j\\omega)} \\to \\infty$ 不穩定，定義兩個衡量 $G(j\\omega)$ 距離臨界點 $(-1, j0)$ 的相對穩定度指標（Fig. 7-12）：\n1. **增益邊限（Gain Margin, GM）**：設相位穿越頻率 $\\omega^*$ 滿足 $\\angle G(j\\omega^*) = 180^\\circ$，則：\n   $$GM = -20\\log_{10}|G(j\\omega^*)| \\quad (\\text{dB})$$\n2. **相位邊限（Phase Margin, PM 或 $\\phi_{pm}$）**：設增益穿越頻率（Gain-crossover frequency）$\\omega_g$ 滿足 $|G(j\\omega_g)| = 1$（即 $0\\text{ dB}$），則：\n   $$\\phi_{pm} = 180^\\circ + \\angle G(j\\omega_g) \\quad (\\text{或 } 180^\\circ - |\\angle G(j\\omega_g)|)$$\n3. **頻域與時域指標轉換公式（p. 45, Fig. 7-13）**：\n   - 相位邊限與阻尼比的線性近似（當 $\\zeta \\le 0.6$ 時極準確）：\n     $$\\phi_{pm} = \\tan^{-1}\\frac{2\\zeta}{\\sqrt{-2\\zeta^2 + \\sqrt{1+4\\zeta^4}}} \\implies \\zeta \\approx 0.01 \\phi_{pm} \\; (\\phi_{pm} \\text{ 以度為單位})$$\n   - 頻寬 $\\omega_{BW}$（常以 $\\omega_g$ 近似）與安定時間 $T_s$ 成反比：頻寬愈大，反應愈快、安定時間 $T_s$ 愈短。\n\n### 5. 頻域穩態誤差判讀與奈奎斯特穩定判據（pp. 45–47）\n- **由波德圖低頻段直接讀取系統型別與誤差常數（pp. 45–46, Fig. 7-14）**：\n  - 低頻段為 **水平線（$0\\text{ dB/dec}$）** $\\implies$ **Type 0 系統**，高度即為 $20\\log_{10} K_p$。\n  - 低頻段斜率為 **$-20\\text{ dB/dec}$** $\\implies$ **Type 1 系統**，該初始斜線（或其延長線）與 $0\\text{ dB}$ 橫軸交點頻率即為 $\\omega = K_v$。\n  - 低頻段斜率為 **$-40\\text{ dB/dec}$** $\\implies$ **Type 2 系統**，該初始斜線（或其延長線）與 $0\\text{ dB}$ 橫軸交點頻率為 $\\sqrt{K_a}$（即交點頻率平方等於 $K_a$）。\n- **奈奎斯特穩定判據（Nyquist Stability Criterion, pp. 46–47, Fig. 7-15 & 7-16）**：\n  將包圍整個右半平面（RHP）的順時針奈氏路徑映射至 $G(s)$ 平面形成 **奈奎斯特圖（Nyquist Plot）**。**閉迴路系統穩定的充要條件為：奈奎斯特圖逆時針（Counter-clockwise）包圍臨界點 $(-1, 0)$ 的圈數 $N$，恰好等於開迴路系統 $G(s)$ 位於右半平面（RHP）的不穩定極點個數！**（若開迴路本身穩定 $P=0$，則奈氏圖不可包圍 $(-1,0)$ 點）。\n\n## 關聯知識節點（Cross-References）\n- [[bode-plot-and-stability-margins|概念卡：波德圖漸近線速繪、增益/相位邊限與奈奎斯特判據]]\n- [[system-type-and-error-constants|概念卡：系統型別與誤差常數（時域與頻域雙重解析）]]\n- [[ch04-stability|Chapter 4: 穩定度分析]]\n", "path": "wiki/chapters/ch07-frequency-response.md"}, {"id": "transfer-function-and-causality", "title": "轉移函數性質與系統因果性 (Transfer Function Properties & Causality)", "category": "concept", "chapter": "Chapter 2", "source_pages": "pp. 6–8", "updated": "2026-11-14", "tags": ["轉移函數", "真分系統", "嚴格真分", "假分系統", "因果性", "Causality"], "related": ["ch02-mathematical-model", "ch03-system-dynamics-transient"], "body": "# 轉移函數性質與系統因果性 (Transfer Function Properties & Causality)\n\n> **核心摘要**：線性非時變（LTI）SISO 系統在零初始條件下，輸出與輸入的拉氏轉換比值 $G(s) = \\frac{N(s)}{D(s)}$ 獨立於輸入信號，唯一決定系統特性。分子與分母多項式的階數關係（$\\deg N(s)$ vs. $\\deg D(s)$）直接決定系統是否滿足物理世界的**因果性（Causality）**。\n\n## 核心理論與數學推導\n\n### 1. 有理分式型式與真分性分類（p. 8, Eq. 2-14）\n轉移函數表示為兩個 $s$ 的多項式之比：\n$$G(s) = \\frac{N(s)}{D(s)} \\quad \\text{(2-14)}$$\n依據分子階數 $\\deg N(s)$ 與分母階數 $\\deg D(s)$ 的大小關係，定義：\n1. **真分轉移函數（Proper Transfer Function）**：$\\deg N(s) \\le \\deg D(s)$。\n2. **嚴格真分轉移函數（Strictly Proper Transfer Function）**：$\\deg N(s) < \\deg D(s)$（當 $\\omega \\to \\infty$ 時 $|G(j\\omega)| \\to 0$，對應高頻壓抑的低通特性）。\n3. **假分轉移函數（Improper Transfer Function）**：$\\deg N(s) > \\deg D(s)$。\n\n### 2. 為什麼真實物理系統不可能是假分系統？（因果性證明, p. 8, Eq. 2-15 & 2-16）\n考慮牛頓第二運動定律：作用力 $F(t)$ 為輸入、速度 $v(t)$ 為輸出：\n$$m\\frac{dv(t)}{dt} = F(t) \\implies G(s) = \\frac{V(s)}{F(s)} = \\frac{1}{ms} \\quad (\\text{嚴格真分，滿足因果性}) \\quad \\text{(2-15)}$$\n此處「現在與過去的力 $F$」透過積分決定「未來的速度 $v$」，符合「先有因（輸入），後有果（輸出）」的物理定律。\n\n反之，若顛倒過來將速度 $v(t)$ 視為輸入、力 $F(t)$ 視為輸出，則轉移函數變成 $G(s) = \\frac{F(s)}{V(s)} = ms$（$\\deg N = 1 > \\deg D = 0$，**假分系統**）。在時域中，導數定義為：\n$$F(t) = m \\lim_{\\Delta t \\to 0} \\frac{v(t + \\Delta t) - v(t)}{\\Delta t} \\quad \\text{(2-16)}$$\n這意味著**現在時刻的輸出 $F(t)$ 必須依賴未來時刻的輸入 $v(t + \\Delta t)$**！在真實物理世界中，系統無法預知未來輸入，因此**假分系統違反因果性（Violate Causality），無法獨立存在於實際物理系統中**（這也是為何純微分控制器 $K_d s$ 在高頻會放大雜訊且需搭配低通濾波實作的原因）。\n\n## 關聯知識節點（Cross-References）\n- [[ch02-mathematical-model|Chapter 2: 數學模型與轉移函數]]\n- [[ch07-frequency-response|Chapter 7: 頻率響應法（高通濾波器為何屬於 Improper, p. 43）]]", "raw": "---\nid: transfer-function-and-causality\ntitle: \"轉移函數性質與系統因果性 (Transfer Function Properties & Causality)\"\ncategory: concept\nchapter: \"Chapter 2\"\nsource_pages: \"pp. 6–8\"\nupdated: 2026-11-14\ntags: [轉移函數, 真分系統, 嚴格真分, 假分系統, 因果性, Causality]\nrelated: [ch02-mathematical-model, ch03-system-dynamics-transient]\n---\n\n# 轉移函數性質與系統因果性 (Transfer Function Properties & Causality)\n\n> **核心摘要**：線性非時變（LTI）SISO 系統在零初始條件下，輸出與輸入的拉氏轉換比值 $G(s) = \\frac{N(s)}{D(s)}$ 獨立於輸入信號，唯一決定系統特性。分子與分母多項式的階數關係（$\\deg N(s)$ vs. $\\deg D(s)$）直接決定系統是否滿足物理世界的**因果性（Causality）**。\n\n## 核心理論與數學推導\n\n### 1. 有理分式型式與真分性分類（p. 8, Eq. 2-14）\n轉移函數表示為兩個 $s$ 的多項式之比：\n$$G(s) = \\frac{N(s)}{D(s)} \\quad \\text{(2-14)}$$\n依據分子階數 $\\deg N(s)$ 與分母階數 $\\deg D(s)$ 的大小關係，定義：\n1. **真分轉移函數（Proper Transfer Function）**：$\\deg N(s) \\le \\deg D(s)$。\n2. **嚴格真分轉移函數（Strictly Proper Transfer Function）**：$\\deg N(s) < \\deg D(s)$（當 $\\omega \\to \\infty$ 時 $|G(j\\omega)| \\to 0$，對應高頻壓抑的低通特性）。\n3. **假分轉移函數（Improper Transfer Function）**：$\\deg N(s) > \\deg D(s)$。\n\n### 2. 為什麼真實物理系統不可能是假分系統？（因果性證明, p. 8, Eq. 2-15 & 2-16）\n考慮牛頓第二運動定律：作用力 $F(t)$ 為輸入、速度 $v(t)$ 為輸出：\n$$m\\frac{dv(t)}{dt} = F(t) \\implies G(s) = \\frac{V(s)}{F(s)} = \\frac{1}{ms} \\quad (\\text{嚴格真分，滿足因果性}) \\quad \\text{(2-15)}$$\n此處「現在與過去的力 $F$」透過積分決定「未來的速度 $v$」，符合「先有因（輸入），後有果（輸出）」的物理定律。\n\n反之，若顛倒過來將速度 $v(t)$ 視為輸入、力 $F(t)$ 視為輸出，則轉移函數變成 $G(s) = \\frac{F(s)}{V(s)} = ms$（$\\deg N = 1 > \\deg D = 0$，**假分系統**）。在時域中，導數定義為：\n$$F(t) = m \\lim_{\\Delta t \\to 0} \\frac{v(t + \\Delta t) - v(t)}{\\Delta t} \\quad \\text{(2-16)}$$\n這意味著**現在時刻的輸出 $F(t)$ 必須依賴未來時刻的輸入 $v(t + \\Delta t)$**！在真實物理世界中，系統無法預知未來輸入，因此**假分系統違反因果性（Violate Causality），無法獨立存在於實際物理系統中**（這也是為何純微分控制器 $K_d s$ 在高頻會放大雜訊且需搭配低通濾波實作的原因）。\n\n## 關聯知識節點（Cross-References）\n- [[ch02-mathematical-model|Chapter 2: 數學模型與轉移函數]]\n- [[ch07-frequency-response|Chapter 7: 頻率響應法（高通濾波器為何屬於 Improper, p. 43）]]\n", "path": "wiki/concepts/transfer-function-and-causality.md"}, {"id": "second-order-performance-indices", "title": "二階系統暫態性能指標與 s 平面極點幾何對應 (2nd-Order Performance Indices)", "category": "concept", "chapter": "Chapter 3", "source_pages": "pp. 13–17", "updated": "2026-11-14", "tags": ["上升時間", "峰值時間", "安定時間", "最大超越量", "極點位置", "等阻尼線"], "related": ["ch03-system-dynamics-transient", "effects-of-zeros-and-dominant-poles", "ch06-root-locus"], "body": "# 二階系統暫態性能指標與 s 平面極點幾何對應 (2nd-Order Performance Indices)\n\n> **核心摘要**：標準欠阻尼二階系統 $G(s) = \\frac{\\omega_n^2}{s^2 + 2\\zeta\\omega_n s + \\omega_n^2}$ 的極點位於 $s = -\\sigma_d \\pm j\\omega_d = -\\zeta\\omega_n \\pm j\\omega_n\\sqrt{1-\\zeta^2}$。極點在複數平面上的**實部、虛部與夾角**分別一對一控制步階響應的**包絡線衰減快慢（$T_s$）、振盪頻率（$T_p$）與最大超越量（$\\%OS$）**。\n\n## 核心理論與極點幾何對應（pp. 15–17, Fig. 3-8）\n\n### 1. 四大性能指標公式總整理\n| 性能指標 | 符號 | 數學公式（適用於 $0 < \\zeta < 1$ 標準二階系統） | 主要決定參數 |\n| :--- | :--- | :--- | :--- |\n| **最大超越量（Percent Overshoot）** | $\\%OS$ | $\\%OS = e^{-\\pi\\zeta / \\sqrt{1-\\zeta^2}} \\times 100\\%$ (3-25) | 僅取決於阻尼比 $\\zeta$ |\n| **2% 安定時間（Settling Time）** | $T_s$ | $T_s \\approx \\frac{4}{\\zeta\\omega_n} = \\frac{4}{\\sigma_d}$ (3-24) | 取決於極點實部大小 $\\sigma_d = \\zeta\\omega_n$ |\n| **峰值時間（Peak Time）** | $T_p$ | $T_p = \\frac{\\pi}{\\omega_d} = \\frac{\\pi}{\\omega_n\\sqrt{1-\\zeta^2}}$ (3-26) | 取決於極點虛部（阻尼自然頻率 $\\omega_d$） |\n| **上升時間（Rise Time, 10%~90%）** | $T_r$ | 由正規化圖表 $\\omega_n T_r$ 查表（約 $\\frac{1.8}{\\omega_n}$）(Fig. 3-7b) | 與 $\\omega_n$ 成反比、隨 $\\zeta$ 增加而遞增 |\n\n> **重要設計取捨**：當 $\\zeta < 1$ 時，調大 $\\zeta$ 可同時降低 $\\%OS$ 並縮短 $T_s$；但當 $\\zeta \\ge 1$ 時完全無超越量（$\\%OS = 0\\%$），繼續增大 $\\zeta$ 反而會使反應變遲鈍、$T_s$ 再度變長。因此**安定時間 $T_s$ 在 $\\zeta = 1$（臨界阻尼）處達到最小值**（p. 15）。\n\n### 2. $s$ 平面極點移動的三大幾何不變律（pp. 16–17, Fig. 3-8）\n1. **相同實部（垂直線 $\\sigma = -\\zeta\\omega_n = \\text{const}$，Fig. 3-8a）**：\n   - 指數衰減包絡線 $e^{-\\zeta\\omega_n t}$ 完全相同 $\\implies$ **安定時間 $T_s \\approx \\frac{4}{\\zeta\\omega_n}$ 相同**。\n2. **相同虛部（水平線 $\\omega_d = \\omega_n\\sqrt{1-\\zeta^2} = \\text{const}$，Fig. 3-8b）**：\n   - 正弦振盪頻率 $\\omega_d$ 完全相同 $\\implies$ **峰值時間 $T_p = \\frac{\\pi}{\\omega_d}$ 與振盪週期相同**。\n3. **相同極角（由原點射出之斜直線 $\\theta = \\cos^{-1}\\zeta = \\text{const}$，Fig. 3-8c）**：\n   - 實部與虛部比值固定，即阻尼比 $\\zeta = \\cos\\theta$ 相同 $\\implies$ **最大超越量 $\\%OS$ 完全相同**。\n\n## 典型習題詳解：由步階響應圖反推轉移函數（p. 16 Exercise）\n觀察講義第 16 頁的單位步階響應圖（Step Response）：\n1. **讀取圖形特徵值**：\n   - 穩態終值 $x_{ss} = 1$。\n   - 第一峰值約為 $x_{\\max} \\approx 1.40 \\implies$ 最大超越量 $\\%OS = \\frac{1.40 - 1}{1} = 40\\% = 0.40$。\n   - 峰值發生時間約在 $T_p \\approx 1.6\\text{ sec}$。\n   - 響應曲線進入 $1 \\pm 0.02$ 範圍之安定時間約為 $T_s \\approx 7.0\\text{ sec}$；10% 至 90% 上升時間約為 $T_r \\approx 0.8\\text{ sec}$。\n2. **反推阻尼比 $\\zeta$ 與自然頻率 $\\omega_n$**：\n   - 由 $e^{-\\pi\\zeta/\\sqrt{1-\\zeta^2}} = 0.40 \\implies \\frac{\\pi\\zeta}{\\sqrt{1-\\zeta^2}} = -\\ln(0.40) \\approx 0.9163 \\implies \\zeta \\approx 0.28$。\n   - 由 $T_p = \\frac{\\pi}{\\omega_n\\sqrt{1-\\zeta^2}} \\approx 1.6 \\implies \\omega_d = \\frac{\\pi}{1.6} \\approx 1.963\\text{ rad/s} \\implies \\omega_n = \\frac{1.963}{\\sqrt{1-0.28^2}} \\approx 2.04\\text{ rad/s}$（檢查 $T_s \\approx \\frac{4}{\\zeta\\omega_n} \\approx \\frac{4}{0.28 \\times 2.04} \\approx 7.0\\text{ sec}$，完全吻合！）。\n3. **寫出轉移函數**：\n   $$G(s) = \\frac{\\omega_n^2}{s^2 + 2\\zeta\\omega_n s + \\omega_n^2} \\approx \\frac{4.16}{s^2 + 1.14s + 4.16}$$\n\n## 關聯知識節點（Cross-References）\n- [[ch03-system-dynamics-transient|Chapter 3: 系統動態與暫態性能]]\n- [[effects-of-zeros-and-dominant-poles|概念卡：零點效應、非最小相位下衝與主導極點近似]]\n- [[ch06-root-locus|Chapter 6: 根軌跡法]]", "raw": "---\nid: second-order-performance-indices\ntitle: \"二階系統暫態性能指標與 s 平面極點幾何對應 (2nd-Order Performance Indices)\"\ncategory: concept\nchapter: \"Chapter 3\"\nsource_pages: \"pp. 13–17\"\nupdated: 2026-11-14\ntags: [上升時間, 峰值時間, 安定時間, 最大超越量, 極點位置, 等阻尼線]\nrelated: [ch03-system-dynamics-transient, effects-of-zeros-and-dominant-poles, ch06-root-locus]\n---\n\n# 二階系統暫態性能指標與 s 平面極點幾何對應 (2nd-Order Performance Indices)\n\n> **核心摘要**：標準欠阻尼二階系統 $G(s) = \\frac{\\omega_n^2}{s^2 + 2\\zeta\\omega_n s + \\omega_n^2}$ 的極點位於 $s = -\\sigma_d \\pm j\\omega_d = -\\zeta\\omega_n \\pm j\\omega_n\\sqrt{1-\\zeta^2}$。極點在複數平面上的**實部、虛部與夾角**分別一對一控制步階響應的**包絡線衰減快慢（$T_s$）、振盪頻率（$T_p$）與最大超越量（$\\%OS$）**。\n\n## 核心理論與極點幾何對應（pp. 15–17, Fig. 3-8）\n\n### 1. 四大性能指標公式總整理\n| 性能指標 | 符號 | 數學公式（適用於 $0 < \\zeta < 1$ 標準二階系統） | 主要決定參數 |\n| :--- | :--- | :--- | :--- |\n| **最大超越量（Percent Overshoot）** | $\\%OS$ | $\\%OS = e^{-\\pi\\zeta / \\sqrt{1-\\zeta^2}} \\times 100\\%$ (3-25) | 僅取決於阻尼比 $\\zeta$ |\n| **2% 安定時間（Settling Time）** | $T_s$ | $T_s \\approx \\frac{4}{\\zeta\\omega_n} = \\frac{4}{\\sigma_d}$ (3-24) | 取決於極點實部大小 $\\sigma_d = \\zeta\\omega_n$ |\n| **峰值時間（Peak Time）** | $T_p$ | $T_p = \\frac{\\pi}{\\omega_d} = \\frac{\\pi}{\\omega_n\\sqrt{1-\\zeta^2}}$ (3-26) | 取決於極點虛部（阻尼自然頻率 $\\omega_d$） |\n| **上升時間（Rise Time, 10%~90%）** | $T_r$ | 由正規化圖表 $\\omega_n T_r$ 查表（約 $\\frac{1.8}{\\omega_n}$）(Fig. 3-7b) | 與 $\\omega_n$ 成反比、隨 $\\zeta$ 增加而遞增 |\n\n> **重要設計取捨**：當 $\\zeta < 1$ 時，調大 $\\zeta$ 可同時降低 $\\%OS$ 並縮短 $T_s$；但當 $\\zeta \\ge 1$ 時完全無超越量（$\\%OS = 0\\%$），繼續增大 $\\zeta$ 反而會使反應變遲鈍、$T_s$ 再度變長。因此**安定時間 $T_s$ 在 $\\zeta = 1$（臨界阻尼）處達到最小值**（p. 15）。\n\n### 2. $s$ 平面極點移動的三大幾何不變律（pp. 16–17, Fig. 3-8）\n1. **相同實部（垂直線 $\\sigma = -\\zeta\\omega_n = \\text{const}$，Fig. 3-8a）**：\n   - 指數衰減包絡線 $e^{-\\zeta\\omega_n t}$ 完全相同 $\\implies$ **安定時間 $T_s \\approx \\frac{4}{\\zeta\\omega_n}$ 相同**。\n2. **相同虛部（水平線 $\\omega_d = \\omega_n\\sqrt{1-\\zeta^2} = \\text{const}$，Fig. 3-8b）**：\n   - 正弦振盪頻率 $\\omega_d$ 完全相同 $\\implies$ **峰值時間 $T_p = \\frac{\\pi}{\\omega_d}$ 與振盪週期相同**。\n3. **相同極角（由原點射出之斜直線 $\\theta = \\cos^{-1}\\zeta = \\text{const}$，Fig. 3-8c）**：\n   - 實部與虛部比值固定，即阻尼比 $\\zeta = \\cos\\theta$ 相同 $\\implies$ **最大超越量 $\\%OS$ 完全相同**。\n\n## 典型習題詳解：由步階響應圖反推轉移函數（p. 16 Exercise）\n觀察講義第 16 頁的單位步階響應圖（Step Response）：\n1. **讀取圖形特徵值**：\n   - 穩態終值 $x_{ss} = 1$。\n   - 第一峰值約為 $x_{\\max} \\approx 1.40 \\implies$ 最大超越量 $\\%OS = \\frac{1.40 - 1}{1} = 40\\% = 0.40$。\n   - 峰值發生時間約在 $T_p \\approx 1.6\\text{ sec}$。\n   - 響應曲線進入 $1 \\pm 0.02$ 範圍之安定時間約為 $T_s \\approx 7.0\\text{ sec}$；10% 至 90% 上升時間約為 $T_r \\approx 0.8\\text{ sec}$。\n2. **反推阻尼比 $\\zeta$ 與自然頻率 $\\omega_n$**：\n   - 由 $e^{-\\pi\\zeta/\\sqrt{1-\\zeta^2}} = 0.40 \\implies \\frac{\\pi\\zeta}{\\sqrt{1-\\zeta^2}} = -\\ln(0.40) \\approx 0.9163 \\implies \\zeta \\approx 0.28$。\n   - 由 $T_p = \\frac{\\pi}{\\omega_n\\sqrt{1-\\zeta^2}} \\approx 1.6 \\implies \\omega_d = \\frac{\\pi}{1.6} \\approx 1.963\\text{ rad/s} \\implies \\omega_n = \\frac{1.963}{\\sqrt{1-0.28^2}} \\approx 2.04\\text{ rad/s}$（檢查 $T_s \\approx \\frac{4}{\\zeta\\omega_n} \\approx \\frac{4}{0.28 \\times 2.04} \\approx 7.0\\text{ sec}$，完全吻合！）。\n3. **寫出轉移函數**：\n   $$G(s) = \\frac{\\omega_n^2}{s^2 + 2\\zeta\\omega_n s + \\omega_n^2} \\approx \\frac{4.16}{s^2 + 1.14s + 4.16}$$\n\n## 關聯知識節點（Cross-References）\n- [[ch03-system-dynamics-transient|Chapter 3: 系統動態與暫態性能]]\n- [[effects-of-zeros-and-dominant-poles|概念卡：零點效應、非最小相位下衝與主導極點近似]]\n- [[ch06-root-locus|Chapter 6: 根軌跡法]]\n", "path": "wiki/concepts/second-order-performance-indices.md"}, {"id": "effects-of-zeros-and-dominant-poles", "title": "零點效應、非最小相位下衝與主導極點近似 (Zeros & Dominant Poles)", "category": "concept", "chapter": "Chapter 3", "source_pages": "pp. 17–20", "updated": "2026-11-14", "tags": ["零點效應", "非最小相位", "下衝", "Undershoot", "主導極點", "步階響應配對"], "related": ["ch03-system-dynamics-transient", "second-order-performance-indices", "ch07-frequency-response"], "body": "# 零點效應、非最小相位下衝與主導極點近似 (Zeros & Dominant Poles)\n\n> **核心摘要**：當標準二階系統加入額外的零點或極點時，系統步階響應會產生可預測的形變：左半平面零點會加入微分項而**拉高超越量 $\\%OS$**，右半平面零點會造成初始反向**下衝（Undershoot）**，而左半平面附加極點則扮演低通濾波緩衝角色而**壓低超越量並延緩上升**。\n\n## 核心理論與數學推導\n\n### 1. 附加零點對步階響應的影響（pp. 17–18, Fig. 3-9 ~ 3-11）\n考慮具有零點 $s = -z$ 且直流增益正規化為 1 的二階系統：\n$$G(s) = \\frac{(\\omega_n^2 / z)(s + z)}{s^2 + 2\\zeta\\omega_n s + \\omega_n^2} = G_{\\text{std}}(s) + \\frac{1}{z} s G_{\\text{std}}(s) \\quad \\text{(3-27, 3-28)}$$\n設標準二階系統 $G_{\\text{std}}(s)$ 的單位步階響應為 $c(t)$，則 $G(s)$ 的單位步階響應為：\n$$y(t) = c(t) + \\frac{1}{z}\\frac{dc(t)}{dt}$$\n- **情況 A：$z > 0$（左半平面零點，LHP Zero）**：\n  - 由於起步階段斜率 $\\frac{dc(t)}{dt} > 0$，疊加正微分項會使響應上升更快，且 **$z$ 愈小（零點愈靠近原點），微分放大倍率 $\\frac{1}{z}$ 愈大，超越量 $\\%OS$ 就愈劇烈**（Fig. 3-10：zero at -3 的峰值遠高於 zero at -10）。\n  - 當 $z \\to \\infty$（零點在極遠處）時，$\\frac{1}{z} \\to 0$，系統退化回標準二階系統 $c(t)$。\n- **情況 B：$z < 0$（右半平面零點，RHP Zero — 非最小相位系統）**：\n  - 此時 $\\frac{1}{z} < 0$，在 $t=0^+$ 初期正斜率乘上負號，導致輸出 $y(t)$ **先往負方向掉下去，再反彈上升至正的穩態值**，稱為 **下衝（Undershoot）**（Fig. 3-11）。\n\n### 2. 主導極點與附加極點效應（Dominant Poles & Additional Poles, p. 19）\n考慮講義 Example 3-3 的三個系統（主導極點皆為 $s = -2 \\pm j4.53$）：\n- $T_1(s) = \\frac{24.5}{s^2 + 4s + 24.5}$（標準二階系統）\n- $T_2(s) = \\frac{245}{(s+10)(s^2 + 4s + 24.5)}$（附加遠離極點 $s = -10$）\n- $T_3(s) = \\frac{73.5}{(s+3)(s^2 + 4s + 24.5)}$（附加靠近極點 $s = -3$）\n\n**結論**：因為 $-10 \\ll -2$（實部距離超過 5 倍），$T_2(s)$ 的步階響應 $c_2(t)$ 幾乎與標準系統 $c_1(t)$ 重疊；但 $s = -3$ 非常靠近主導極點實部 $-2$，會顯著發揮低通濾波阻尼作用，使 $c_3(t)$ 的**超越量 $\\%OS$ 明顯降低、峰值時間延後**。\n\n## 經典必考題詳解：第 20 頁六組系統步階響應配對（p. 20 Exercise）\n題目給定六個轉移函數（共同二階極點為 $s^2 + s + 25 = 0 \\implies \\omega_n = 5, \\zeta = 0.1$）：\n- **(a)** $G_a(s) = \\frac{25}{s^2+s+25}$：標準二階系統（基準曲線）。\n- **(b)** $G_b(s) = \\frac{s+25}{s^2+s+25} = \\frac{25(s/25 + 1)}{s^2+s+25}$：具遠處 LHP 零點 $z = 25$，超越量略高於 (a)。\n- **(c)** $G_c(s) = \\frac{5s+25}{s^2+s+25} = \\frac{25(s/5 + 1)}{s^2+s+25}$：具靠近原點之 LHP 零點 $z = 5$，微分效應極強，**正向超越量最大（最高峰達 ~2.05 之藍色曲線）**。\n- **(d)** $G_d(s) = \\frac{-5s+25}{s^2+s+25} = \\frac{25(-s/5 + 1)}{s^2+s+25}$：具 RHP 零點 $s = +5$（$z = -5$，非最小相位），起步時**先往下掉至 $-0.45$ 產生明顯負向 Undershoot（黃綠色下衝曲線）**。\n- **(e)** $G_e(s) = \\frac{25}{(0.1s+1)(s^2+s+25)}$：附加極遠極點 $s = -10$（$-10 \\ll -0.5$），響應幾乎與基準曲線 (a) 貼近但略微延遲、峰值略低一點點。\n- **(f)** $G_f(s) = \\frac{25}{(2s+1)(s^2+s+25)}$：附加極靠近原點之極點 $s = -0.5$（時間常數長達 $2\\text{ sec}$），主導了緩慢指數爬升趨勢，使振盪被大幅壓抑（**無明顯高超越量、緩慢爬升的洋紅色曲線**）。\n\n## 關聯知識節點（Cross-References）\n- [[ch03-system-dynamics-transient|Chapter 3: 系統動態與暫態性能]]\n- [[second-order-performance-indices|概念卡：二階系統暫態性能指標與極點幾何對應]]\n- [[bode-plot-and-stability-margins|概念卡：波德圖與最小/非最小相位系統]]", "raw": "---\nid: effects-of-zeros-and-dominant-poles\ntitle: \"零點效應、非最小相位下衝與主導極點近似 (Zeros & Dominant Poles)\"\ncategory: concept\nchapter: \"Chapter 3\"\nsource_pages: \"pp. 17–20\"\nupdated: 2026-11-14\ntags: [零點效應, 非最小相位, 下衝, Undershoot, 主導極點, 步階響應配對]\nrelated: [ch03-system-dynamics-transient, second-order-performance-indices, ch07-frequency-response]\n---\n\n# 零點效應、非最小相位下衝與主導極點近似 (Zeros & Dominant Poles)\n\n> **核心摘要**：當標準二階系統加入額外的零點或極點時，系統步階響應會產生可預測的形變：左半平面零點會加入微分項而**拉高超越量 $\\%OS$**，右半平面零點會造成初始反向**下衝（Undershoot）**，而左半平面附加極點則扮演低通濾波緩衝角色而**壓低超越量並延緩上升**。\n\n## 核心理論與數學推導\n\n### 1. 附加零點對步階響應的影響（pp. 17–18, Fig. 3-9 ~ 3-11）\n考慮具有零點 $s = -z$ 且直流增益正規化為 1 的二階系統：\n$$G(s) = \\frac{(\\omega_n^2 / z)(s + z)}{s^2 + 2\\zeta\\omega_n s + \\omega_n^2} = G_{\\text{std}}(s) + \\frac{1}{z} s G_{\\text{std}}(s) \\quad \\text{(3-27, 3-28)}$$\n設標準二階系統 $G_{\\text{std}}(s)$ 的單位步階響應為 $c(t)$，則 $G(s)$ 的單位步階響應為：\n$$y(t) = c(t) + \\frac{1}{z}\\frac{dc(t)}{dt}$$\n- **情況 A：$z > 0$（左半平面零點，LHP Zero）**：\n  - 由於起步階段斜率 $\\frac{dc(t)}{dt} > 0$，疊加正微分項會使響應上升更快，且 **$z$ 愈小（零點愈靠近原點），微分放大倍率 $\\frac{1}{z}$ 愈大，超越量 $\\%OS$ 就愈劇烈**（Fig. 3-10：zero at -3 的峰值遠高於 zero at -10）。\n  - 當 $z \\to \\infty$（零點在極遠處）時，$\\frac{1}{z} \\to 0$，系統退化回標準二階系統 $c(t)$。\n- **情況 B：$z < 0$（右半平面零點，RHP Zero — 非最小相位系統）**：\n  - 此時 $\\frac{1}{z} < 0$，在 $t=0^+$ 初期正斜率乘上負號，導致輸出 $y(t)$ **先往負方向掉下去，再反彈上升至正的穩態值**，稱為 **下衝（Undershoot）**（Fig. 3-11）。\n\n### 2. 主導極點與附加極點效應（Dominant Poles & Additional Poles, p. 19）\n考慮講義 Example 3-3 的三個系統（主導極點皆為 $s = -2 \\pm j4.53$）：\n- $T_1(s) = \\frac{24.5}{s^2 + 4s + 24.5}$（標準二階系統）\n- $T_2(s) = \\frac{245}{(s+10)(s^2 + 4s + 24.5)}$（附加遠離極點 $s = -10$）\n- $T_3(s) = \\frac{73.5}{(s+3)(s^2 + 4s + 24.5)}$（附加靠近極點 $s = -3$）\n\n**結論**：因為 $-10 \\ll -2$（實部距離超過 5 倍），$T_2(s)$ 的步階響應 $c_2(t)$ 幾乎與標準系統 $c_1(t)$ 重疊；但 $s = -3$ 非常靠近主導極點實部 $-2$，會顯著發揮低通濾波阻尼作用，使 $c_3(t)$ 的**超越量 $\\%OS$ 明顯降低、峰值時間延後**。\n\n## 經典必考題詳解：第 20 頁六組系統步階響應配對（p. 20 Exercise）\n題目給定六個轉移函數（共同二階極點為 $s^2 + s + 25 = 0 \\implies \\omega_n = 5, \\zeta = 0.1$）：\n- **(a)** $G_a(s) = \\frac{25}{s^2+s+25}$：標準二階系統（基準曲線）。\n- **(b)** $G_b(s) = \\frac{s+25}{s^2+s+25} = \\frac{25(s/25 + 1)}{s^2+s+25}$：具遠處 LHP 零點 $z = 25$，超越量略高於 (a)。\n- **(c)** $G_c(s) = \\frac{5s+25}{s^2+s+25} = \\frac{25(s/5 + 1)}{s^2+s+25}$：具靠近原點之 LHP 零點 $z = 5$，微分效應極強，**正向超越量最大（最高峰達 ~2.05 之藍色曲線）**。\n- **(d)** $G_d(s) = \\frac{-5s+25}{s^2+s+25} = \\frac{25(-s/5 + 1)}{s^2+s+25}$：具 RHP 零點 $s = +5$（$z = -5$，非最小相位），起步時**先往下掉至 $-0.45$ 產生明顯負向 Undershoot（黃綠色下衝曲線）**。\n- **(e)** $G_e(s) = \\frac{25}{(0.1s+1)(s^2+s+25)}$：附加極遠極點 $s = -10$（$-10 \\ll -0.5$），響應幾乎與基準曲線 (a) 貼近但略微延遲、峰值略低一點點。\n- **(f)** $G_f(s) = \\frac{25}{(2s+1)(s^2+s+25)}$：附加極靠近原點之極點 $s = -0.5$（時間常數長達 $2\\text{ sec}$），主導了緩慢指數爬升趨勢，使振盪被大幅壓抑（**無明顯高超越量、緩慢爬升的洋紅色曲線**）。\n\n## 關聯知識節點（Cross-References）\n- [[ch03-system-dynamics-transient|Chapter 3: 系統動態與暫態性能]]\n- [[second-order-performance-indices|概念卡：二階系統暫態性能指標與極點幾何對應]]\n- [[bode-plot-and-stability-margins|概念卡：波德圖與最小/非最小相位系統]]\n", "path": "wiki/concepts/effects-of-zeros-and-dominant-poles.md"}, {"id": "routh-hurwitz-criterion", "title": "羅斯-赫維茲穩定判據與兩大特殊情況 (Routh-Hurwitz Criterion & Special Cases)", "category": "concept", "chapter": "Chapter 4", "source_pages": "pp. 24–26", "updated": "2026-11-14", "tags": ["Routh-Hurwitz", "羅斯表", "輔助多項式", "虛軸極點", "穩定度判別"], "related": ["ch04-stability", "ch06-root-locus"], "body": "# 羅斯-赫維茲穩定判據與兩大特殊情況 (Routh-Hurwitz Criterion & Special Cases)\n\n> **核心摘要**：Routh-Hurwitz 判據透過將特徵多項式 $D(s) = a_n s^n + a_{n-1}s^{n-1} + \\dots + a_0$ 的係數排列成 Routh 表，直接由**第一行元素的正負號變化次數**判定右半平面（RHP）不穩定極點的數量。當計算過程遇到「第一行出現單獨 0」或「整列皆為 0」時，分別採用 $\\varepsilon$ 極限法與輔助多項式 $U(s)$ 除法處理。\n\n## 核心理論與 Routh 表建構法則（pp. 24–25）\n\n### 1. 標準 Routh 表建構公式\n將多項式係數依偶次項與奇次項交錯排入前兩列（$s^n$ 與 $s^{n-1}$）：\n$$\\begin{array}{c|cccc}\ns^n & a_n & a_{n-2} & a_{n-4} & \\cdots \\\\\ns^{n-1} & a_{n-1} & a_{n-3} & a_{n-5} & \\cdots \\\\\ns^{n-2} & b_{n-1} & b_{n-3} & b_{n-5} & \\cdots \\\\\ns^{n-3} & c_{n-1} & c_{n-3} & c_{n-5} & \\cdots \\\\\n\\vdots & \\vdots & \\vdots & \\vdots & \\\\\ns^0 & h_{n-1} & & &\n\\end{array}$$\n其中後續各列元素由前兩列之二階行列式計算：\n$$b_{n-1} = \\frac{a_{n-1}a_{n-2} - a_n a_{n-3}}{a_{n-1}}, \\quad b_{n-3} = \\frac{a_{n-1}a_{n-4} - a_n a_{n-5}}{a_{n-1}}$$\n$$c_{n-1} = \\frac{b_{n-1}a_{n-3} - a_{n-1}b_{n-3}}{b_{n-1}}, \\quad c_{n-3} = \\frac{b_{n-1}a_{n-5} - a_{n-1}b_{n-5}}{b_{n-1}}$$\n\n### 2. 兩大特殊情況（Special Cases, pp. 25–26）\n\n#### 特殊情況一：某列第一行元素為 0，但該列不全為 0（$\\varepsilon \\to 0^+$ 極限法）\n- **處理步驟**：將第一行的 $0$ 以微小正數 $\\varepsilon$ 取代，繼續完成整張 Routh 表，最後取 $\\varepsilon \\to 0^+$ 觀察第一行正負號變化。\n- **講義範例（p. 25 Example 1）**：$D(s) = s^5 + 2s^4 + 2s^3 + 4s^2 + 11s + 10$\n  - $s^5$: $1, \\; 2, \\; 11$\n  - $s^4$: $2, \\; 4, \\; 10$\n  - $s^3$: $\\varepsilon, \\; 6, \\; 0$（原為 $\\frac{2(2)-1(4)}{2} = 0$，以 $\\varepsilon$ 取代）\n  - $s^2$: $\\frac{4\\varepsilon - 12}{\\varepsilon} \\approx -\\frac{12}{\\varepsilon} < 0, \\quad 10, \\quad 0$\n  - $s^1$: $\\frac{\\left(\\frac{4\\varepsilon-12}{\\varepsilon}\\right)(6) - 10\\varepsilon}{\\frac{4\\varepsilon-12}{\\varepsilon}} \\to \\frac{-72}{-12} = +6 > 0$\n  - $s^0$: $10$\n  - **結論**：第一行符號為 $(+, +, +, -, +, +)$，共 **2 次變號**，故系統有 **2 個 RHP 極點（不穩定）**。\n\n#### 特殊情況二：整列元素全部為 0（輔助多項式 $U(s)$ 法）\n- **物理意義**：代表 $D(s)$ 含有偶次對稱因式（如共軛虛軸根 $\\pm j\\omega$ 或對稱於原點的根）。\n- **處理步驟**：取全零列**正上方那一列**的係數構成**輔助多項式（Auxiliary Polynomial）$U(s)$**。$U(s)$ 必為 $D(s)$ 的因式！將 $D(s)$ 除以 $U(s)$（或在標準做法中對 $U(s)$ 微分取代全零列），即可分別求出 $U(s)=0$ 的根與商式 $\\frac{D(s)}{U(s)}$ 的根。\n- **講義範例（pp. 25–26 Example 2）**：$D(s) = s^5 + s^4 + 2s^3 + 2s^2 + s + 1$\n  - $s^5$: $1, \\; 2, \\; 1$\n  - $s^4$: $1, \\; 2, \\; 1 \\implies$ 輔助多項式 $U(s) = s^4 + 2s^2 + 1 = (s^2 + 1)^2$\n  - $s^3$: $0, \\; 0, \\; 0$（整列為 0）\n  - **結論**：商式 $D(s)/U(s) = s + 1 \\implies$ 一個左半平面根 $s = -1$；但由 $U(s) = (s^2+1)^2 = 0$ 得虛軸重根 $\\lambda = +j, +j, -j, -j$。因**虛軸上有二重根**，故系統為**不穩定（Unstable）**！\n\n## 關聯知識節點（Cross-References）\n- [[ch04-stability|Chapter 4: 穩定度分析]]\n- [[root-locus-construction-rules|概念卡：根軌跡九大繪製法則（Rule 8 虛軸穿越點計算）]]", "raw": "---\nid: routh-hurwitz-criterion\ntitle: \"羅斯-赫維茲穩定判據與兩大特殊情況 (Routh-Hurwitz Criterion & Special Cases)\"\ncategory: concept\nchapter: \"Chapter 4\"\nsource_pages: \"pp. 24–26\"\nupdated: 2026-11-14\ntags: [Routh-Hurwitz, 羅斯表, 輔助多項式, 虛軸極點, 穩定度判別]\nrelated: [ch04-stability, ch06-root-locus]\n---\n\n# 羅斯-赫維茲穩定判據與兩大特殊情況 (Routh-Hurwitz Criterion & Special Cases)\n\n> **核心摘要**：Routh-Hurwitz 判據透過將特徵多項式 $D(s) = a_n s^n + a_{n-1}s^{n-1} + \\dots + a_0$ 的係數排列成 Routh 表，直接由**第一行元素的正負號變化次數**判定右半平面（RHP）不穩定極點的數量。當計算過程遇到「第一行出現單獨 0」或「整列皆為 0」時，分別採用 $\\varepsilon$ 極限法與輔助多項式 $U(s)$ 除法處理。\n\n## 核心理論與 Routh 表建構法則（pp. 24–25）\n\n### 1. 標準 Routh 表建構公式\n將多項式係數依偶次項與奇次項交錯排入前兩列（$s^n$ 與 $s^{n-1}$）：\n$$\\begin{array}{c|cccc}\ns^n & a_n & a_{n-2} & a_{n-4} & \\cdots \\\\\ns^{n-1} & a_{n-1} & a_{n-3} & a_{n-5} & \\cdots \\\\\ns^{n-2} & b_{n-1} & b_{n-3} & b_{n-5} & \\cdots \\\\\ns^{n-3} & c_{n-1} & c_{n-3} & c_{n-5} & \\cdots \\\\\n\\vdots & \\vdots & \\vdots & \\vdots & \\\\\ns^0 & h_{n-1} & & &\n\\end{array}$$\n其中後續各列元素由前兩列之二階行列式計算：\n$$b_{n-1} = \\frac{a_{n-1}a_{n-2} - a_n a_{n-3}}{a_{n-1}}, \\quad b_{n-3} = \\frac{a_{n-1}a_{n-4} - a_n a_{n-5}}{a_{n-1}}$$\n$$c_{n-1} = \\frac{b_{n-1}a_{n-3} - a_{n-1}b_{n-3}}{b_{n-1}}, \\quad c_{n-3} = \\frac{b_{n-1}a_{n-5} - a_{n-1}b_{n-5}}{b_{n-1}}$$\n\n### 2. 兩大特殊情況（Special Cases, pp. 25–26）\n\n#### 特殊情況一：某列第一行元素為 0，但該列不全為 0（$\\varepsilon \\to 0^+$ 極限法）\n- **處理步驟**：將第一行的 $0$ 以微小正數 $\\varepsilon$ 取代，繼續完成整張 Routh 表，最後取 $\\varepsilon \\to 0^+$ 觀察第一行正負號變化。\n- **講義範例（p. 25 Example 1）**：$D(s) = s^5 + 2s^4 + 2s^3 + 4s^2 + 11s + 10$\n  - $s^5$: $1, \\; 2, \\; 11$\n  - $s^4$: $2, \\; 4, \\; 10$\n  - $s^3$: $\\varepsilon, \\; 6, \\; 0$（原為 $\\frac{2(2)-1(4)}{2} = 0$，以 $\\varepsilon$ 取代）\n  - $s^2$: $\\frac{4\\varepsilon - 12}{\\varepsilon} \\approx -\\frac{12}{\\varepsilon} < 0, \\quad 10, \\quad 0$\n  - $s^1$: $\\frac{\\left(\\frac{4\\varepsilon-12}{\\varepsilon}\\right)(6) - 10\\varepsilon}{\\frac{4\\varepsilon-12}{\\varepsilon}} \\to \\frac{-72}{-12} = +6 > 0$\n  - $s^0$: $10$\n  - **結論**：第一行符號為 $(+, +, +, -, +, +)$，共 **2 次變號**，故系統有 **2 個 RHP 極點（不穩定）**。\n\n#### 特殊情況二：整列元素全部為 0（輔助多項式 $U(s)$ 法）\n- **物理意義**：代表 $D(s)$ 含有偶次對稱因式（如共軛虛軸根 $\\pm j\\omega$ 或對稱於原點的根）。\n- **處理步驟**：取全零列**正上方那一列**的係數構成**輔助多項式（Auxiliary Polynomial）$U(s)$**。$U(s)$ 必為 $D(s)$ 的因式！將 $D(s)$ 除以 $U(s)$（或在標準做法中對 $U(s)$ 微分取代全零列），即可分別求出 $U(s)=0$ 的根與商式 $\\frac{D(s)}{U(s)}$ 的根。\n- **講義範例（pp. 25–26 Example 2）**：$D(s) = s^5 + s^4 + 2s^3 + 2s^2 + s + 1$\n  - $s^5$: $1, \\; 2, \\; 1$\n  - $s^4$: $1, \\; 2, \\; 1 \\implies$ 輔助多項式 $U(s) = s^4 + 2s^2 + 1 = (s^2 + 1)^2$\n  - $s^3$: $0, \\; 0, \\; 0$（整列為 0）\n  - **結論**：商式 $D(s)/U(s) = s + 1 \\implies$ 一個左半平面根 $s = -1$；但由 $U(s) = (s^2+1)^2 = 0$ 得虛軸重根 $\\lambda = +j, +j, -j, -j$。因**虛軸上有二重根**，故系統為**不穩定（Unstable）**！\n\n## 關聯知識節點（Cross-References）\n- [[ch04-stability|Chapter 4: 穩定度分析]]\n- [[root-locus-construction-rules|概念卡：根軌跡九大繪製法則（Rule 8 虛軸穿越點計算）]]\n", "path": "wiki/concepts/routh-hurwitz-criterion.md"}, {"id": "system-type-and-error-constants", "title": "系統型別（Type N）與時頻域誤差常數總整理 (System Type & Error Constants)", "category": "concept", "chapter": "Chapter 5 & Chapter 7", "source_pages": "pp. 29–31, 45–46", "updated": "2026-11-14", "tags": ["系統型別", "Type Number", "位置誤差常數", "速度誤差常數", "加速度誤差常數", "波德圖低頻斜率"], "related": ["ch05-steady-state-error", "ch07-frequency-response", "bode-plot-and-stability-margins"], "body": "# 系統型別（Type N）與時頻域誤差常數總整理 (System Type & Error Constants)\n\n> **核心摘要**：本概念卡跨章節整合 [[ch05-steady-state-error|Chapter 5（時域終值定理）]] 與 [[ch07-frequency-response|Chapter 7（頻域波德圖低頻漸近線）]] 對穩態誤差的分析：系統開迴路轉移函數在原點 $s=0$ 的極點重數 $N$（Type $N$）同時決定了時域誤差常數（$K_p, K_v, K_a$）是否為有限非零值，以及波德圖在低頻段的初始斜率（$-20N\\text{ dB/decade}$）。\n\n## 跨章節整合：時域與頻域誤差常數一覽表（pp. 30–31, 45–46）\n\n設單位負迴授系統之開迴路轉移函數為：\n$$G(s) = \\frac{K(s+z_1)(s+z_2)\\cdots(s+z_M)}{s^N (s+p_1)(s+p_2)\\cdots(s+p_Q)}$$\n且系統已確認為**閉迴路穩定**（否則穩態誤差無意義）：\n\n| 系統型別 | 開迴路積分器數 | 位置誤差常數 $K_p = \\lim_{s\\to 0} G(s)$ | 速度誤差常數 $K_v = \\lim_{s\\to 0} sG(s)$ | 加速度誤差常數 $K_a = \\lim_{s\\to 0} s^2G(s)$ | 波德圖低頻段斜率（Fig. 7-14） | 波德圖幾何讀取法（pp. 45–46） |\n| :--- | :--- | :--- | :--- | :--- | :--- | :--- |\n| **Type 0** | $N = 0$ | $K_p = \\frac{K \\prod z_i}{\\prod p_j} < \\infty$ | $0$ | $0$ | **$0\\text{ dB/dec}$**（水平線） | 低頻水平線高度 $= 20\\log_{10} K_p$ |\n| **Type 1** | $N = 1$ | $\\infty$ | $K_v = \\frac{K \\prod z_i}{\\prod p_j} < \\infty$ | $0$ | **$-20\\text{ dB/dec}$** | 低頻初始斜線與 $0\\text{ dB}$ 軸交點頻率 $= K_v$ |\n| **Type 2** | $N = 2$ | $\\infty$ | $\\infty$ | $K_a = \\frac{K \\prod z_i}{\\prod p_j} < \\infty$ | **$-40\\text{ dB/dec}$** | 低頻初始斜線與 $0\\text{ dB}$ 軸交點頻率 $= \\sqrt{K_a}$ |\n\n## 物理直覺與設計準則\n1. **階層遞進關係（p. 30）**：\n   - 若 $|K_p| < \\infty$，則必有 $K_v = K_a = 0$。\n   - 若 $K_v \\neq 0$，則必有 $K_p = \\infty$；此時若 $|K_v| < \\infty$，則 $K_a = 0$。\n   - **物理意義**：一個控制系統若想要具備追蹤動態變化信號（如等速斜坡信號）的能力，它**必定先具備以零穩態誤差追蹤靜態常數信號的能力**。\n2. **為何不無限制增加系統型別 $N$？**\n   - 每增加一個純積分器 $\\frac{1}{s}$，雖然能將系統型別提升一階以消除穩態誤差，但在頻域中會帶來 **$-90^\\circ$ 的固定相位落後（Phase lag）**，在根軌跡中也會將漸近線重心 $\\sigma_A$ 往右推，大幅降低相對穩定度（甚至使系統不穩定）。\n\n## 關聯知識節點（Cross-References）\n- [[ch05-steady-state-error|Chapter 5: 穩態誤差與系統型別]]\n- [[ch07-frequency-response|Chapter 7: 頻率響應法]]\n- [[bode-plot-and-stability-margins|概念卡：波德圖漸近線速繪与穩定邊限]]", "raw": "---\nid: system-type-and-error-constants\ntitle: \"系統型別（Type N）與時頻域誤差常數總整理 (System Type & Error Constants)\"\ncategory: concept\nchapter: \"Chapter 5 & Chapter 7\"\nsource_pages: \"pp. 29–31, 45–46\"\nupdated: 2026-11-14\ntags: [系統型別, Type Number, 位置誤差常數, 速度誤差常數, 加速度誤差常數, 波德圖低頻斜率]\nrelated: [ch05-steady-state-error, ch07-frequency-response, bode-plot-and-stability-margins]\n---\n\n# 系統型別（Type N）與時頻域誤差常數總整理 (System Type & Error Constants)\n\n> **核心摘要**：本概念卡跨章節整合 [[ch05-steady-state-error|Chapter 5（時域終值定理）]] 與 [[ch07-frequency-response|Chapter 7（頻域波德圖低頻漸近線）]] 對穩態誤差的分析：系統開迴路轉移函數在原點 $s=0$ 的極點重數 $N$（Type $N$）同時決定了時域誤差常數（$K_p, K_v, K_a$）是否為有限非零值，以及波德圖在低頻段的初始斜率（$-20N\\text{ dB/decade}$）。\n\n## 跨章節整合：時域與頻域誤差常數一覽表（pp. 30–31, 45–46）\n\n設單位負迴授系統之開迴路轉移函數為：\n$$G(s) = \\frac{K(s+z_1)(s+z_2)\\cdots(s+z_M)}{s^N (s+p_1)(s+p_2)\\cdots(s+p_Q)}$$\n且系統已確認為**閉迴路穩定**（否則穩態誤差無意義）：\n\n| 系統型別 | 開迴路積分器數 | 位置誤差常數 $K_p = \\lim_{s\\to 0} G(s)$ | 速度誤差常數 $K_v = \\lim_{s\\to 0} sG(s)$ | 加速度誤差常數 $K_a = \\lim_{s\\to 0} s^2G(s)$ | 波德圖低頻段斜率（Fig. 7-14） | 波德圖幾何讀取法（pp. 45–46） |\n| :--- | :--- | :--- | :--- | :--- | :--- | :--- |\n| **Type 0** | $N = 0$ | $K_p = \\frac{K \\prod z_i}{\\prod p_j} < \\infty$ | $0$ | $0$ | **$0\\text{ dB/dec}$**（水平線） | 低頻水平線高度 $= 20\\log_{10} K_p$ |\n| **Type 1** | $N = 1$ | $\\infty$ | $K_v = \\frac{K \\prod z_i}{\\prod p_j} < \\infty$ | $0$ | **$-20\\text{ dB/dec}$** | 低頻初始斜線與 $0\\text{ dB}$ 軸交點頻率 $= K_v$ |\n| **Type 2** | $N = 2$ | $\\infty$ | $\\infty$ | $K_a = \\frac{K \\prod z_i}{\\prod p_j} < \\infty$ | **$-40\\text{ dB/dec}$** | 低頻初始斜線與 $0\\text{ dB}$ 軸交點頻率 $= \\sqrt{K_a}$ |\n\n## 物理直覺與設計準則\n1. **階層遞進關係（p. 30）**：\n   - 若 $|K_p| < \\infty$，則必有 $K_v = K_a = 0$。\n   - 若 $K_v \\neq 0$，則必有 $K_p = \\infty$；此時若 $|K_v| < \\infty$，則 $K_a = 0$。\n   - **物理意義**：一個控制系統若想要具備追蹤動態變化信號（如等速斜坡信號）的能力，它**必定先具備以零穩態誤差追蹤靜態常數信號的能力**。\n2. **為何不無限制增加系統型別 $N$？**\n   - 每增加一個純積分器 $\\frac{1}{s}$，雖然能將系統型別提升一階以消除穩態誤差，但在頻域中會帶來 **$-90^\\circ$ 的固定相位落後（Phase lag）**，在根軌跡中也會將漸近線重心 $\\sigma_A$ 往右推，大幅降低相對穩定度（甚至使系統不穩定）。\n\n## 關聯知識節點（Cross-References）\n- [[ch05-steady-state-error|Chapter 5: 穩態誤差與系統型別]]\n- [[ch07-frequency-response|Chapter 7: 頻率響應法]]\n- [[bode-plot-and-stability-margins|概念卡：波德圖漸近線速繪与穩定邊限]]\n", "path": "wiki/concepts/system-type-and-error-constants.md"}, {"id": "root-locus-construction-rules", "title": "根軌跡九大繪製法則速查與解題 SOP (Root Locus 9 Construction Rules)", "category": "concept", "chapter": "Chapter 6", "source_pages": "pp. 35–36", "updated": "2026-11-14", "tags": ["根軌跡九大法則", "漸近線", "分離點", "離開角", "進入角", "虛軸交點"], "related": ["ch06-root-locus", "routh-hurwitz-criterion", "second-order-performance-indices"], "body": "# 根軌跡九大繪製法則速查與解題 SOP (Root Locus 9 Construction Rules)\n\n> **核心摘要**：本概念卡整理陳世樂教授講義第 35–36 頁所歸納之**根軌跡九大繪製法則（Rule 1 ~ Rule 9）**，提供手繪根軌跡與考題計算的標準解題步驟（SOP）。\n\n## 根軌跡九大法則完整表格（pp. 35–36）\n\n給定特徵方程式 $1 + KG(s) = 0$，其中 $G(s) = \\frac{N(s)}{D(s)} = \\frac{(s+z_1)\\cdots(s+z_M)}{(s+p_1)\\cdots(s+p_n)}$（設 $n = \\deg D(s) \\ge M = \\deg N(s)$，且 $0 \\le K < \\infty$）：\n\n| 法則編號 | 法則名稱 | 數學公式與判別準則 | 工程解題要點 |\n| :--- | :--- | :--- | :--- |\n| **Rule 1** | **分支數（Number of Branches）** | 分支總數 $= n = \\deg D(s)$ | 每一個閉迴路極點隨 $K$ 變化形成一條軌跡 |\n| **Rule 2** | **對稱性（Symmetry）** | 根軌跡必對稱於**實軸（Real Axis）** | 複數極點必以共軛對 $\\sigma \\pm j\\omega$ 成對出現 |\n| **Rule 3** | **起點與終點（Start & End Points）** | $K=0$ 起於開迴路極點 $-p_i$；$K\\to\\infty$ 終於有限零點 $-z_j$ | 共有 $n - M$ 條分支在 $K\\to\\infty$ 時趨向無限遠 $\\infty$ |\n| **Rule 4** | **漸近線（Asymptotes）** | 重心 $\\sigma_A = \\frac{\\sum(-p_i) - \\sum(-z_j)}{n - M}$ (6-12)<br>角度 $\\Phi_A = \\frac{2q+1}{n-M}180^\\circ, \\; q=0,\\dots,n-M-1$ (6-13) | 常見角度：<br>$n-M=2 \\implies \\pm 90^\\circ$<br>$n-M=3 \\implies \\pm 60^\\circ, 180^\\circ$<br>$n-M=4 \\implies \\pm 45^\\circ, \\pm 135^\\circ$ |\n| **Rule 5** | **實軸上的軌跡（Real-Axis Segments）** | 實軸上某點屬於根軌跡 $\\iff$ 其**右側**實數極零點總數為**奇數** | 複數共軛極零點對實軸相角貢獻互相抵銷為 $0^\\circ$，不影響奇偶計數 |\n| **Rule 6** | **分離點 / 會合點（Breakaway / Break-in）** | 聯立 $D(s)+KN(s)=0$ 與 $D'(s)+KN'(s)=0$<br>或解 $\\frac{d}{ds}\\left[-\\frac{D(s)}{N(s)}\\right] = 0$ | 解出的實根 $s$ 必須落在實軸根軌跡區段上（或保證對應之 $K > 0$）才有效 |\n| **Rule 7** | **離開角與進入角（Departure & Arrival Angles）** | 套用相角條件：$\\sum \\angle(s+z_j) - \\sum \\angle(s+p_i) = 180^\\circ$ | 計算複數極點 $p_k$ 離開角：$\\theta_{\\text{dep}} = 180^\\circ + \\sum \\angle(p_k+z_j) - \\sum_{i\\neq k}\\angle(p_k+p_i)$ |\n| **Rule 8** | **與虛軸交點（Imaginary Axis Crossing）** | 將 $D(s) + KN(s) = 0$ 排入 **Routh 表** | 令 $s^1$ 列為 0 求臨界增益 $K_{cr}$，再由上方 $s^2$ 輔助多項式 $U(s)=0$ 求交點頻率 $\\pm j\\omega$ |\n| **Rule 9** | **特定極點之增益計算（Gain at $s^*$）** | $K = \\frac{-D(s^*)}{N(s^*)} = \\frac{1}{|G(s^*)|}$ | 決定 $K$ 後，即可代入 $K_p, K_v, K_a$ 算出閉迴路系統之穩態誤差 |\n\n## 關聯知識節點（Cross-References）\n- [[ch06-root-locus|Chapter 6: 根軌跡法控制器設計]]\n- [[routh-hurwitz-criterion|概念卡：羅斯-赫維茲判據]]\n- [[second-order-performance-indices|概念卡：二階系統暫態性能指標]]", "raw": "---\nid: root-locus-construction-rules\ntitle: \"根軌跡九大繪製法則速查與解題 SOP (Root Locus 9 Construction Rules)\"\ncategory: concept\nchapter: \"Chapter 6\"\nsource_pages: \"pp. 35–36\"\nupdated: 2026-11-14\ntags: [根軌跡九大法則, 漸近線, 分離點, 離開角, 進入角, 虛軸交點]\nrelated: [ch06-root-locus, routh-hurwitz-criterion, second-order-performance-indices]\n---\n\n# 根軌跡九大繪製法則速查與解題 SOP (Root Locus 9 Construction Rules)\n\n> **核心摘要**：本概念卡整理陳世樂教授講義第 35–36 頁所歸納之**根軌跡九大繪製法則（Rule 1 ~ Rule 9）**，提供手繪根軌跡與考題計算的標準解題步驟（SOP）。\n\n## 根軌跡九大法則完整表格（pp. 35–36）\n\n給定特徵方程式 $1 + KG(s) = 0$，其中 $G(s) = \\frac{N(s)}{D(s)} = \\frac{(s+z_1)\\cdots(s+z_M)}{(s+p_1)\\cdots(s+p_n)}$（設 $n = \\deg D(s) \\ge M = \\deg N(s)$，且 $0 \\le K < \\infty$）：\n\n| 法則編號 | 法則名稱 | 數學公式與判別準則 | 工程解題要點 |\n| :--- | :--- | :--- | :--- |\n| **Rule 1** | **分支數（Number of Branches）** | 分支總數 $= n = \\deg D(s)$ | 每一個閉迴路極點隨 $K$ 變化形成一條軌跡 |\n| **Rule 2** | **對稱性（Symmetry）** | 根軌跡必對稱於**實軸（Real Axis）** | 複數極點必以共軛對 $\\sigma \\pm j\\omega$ 成對出現 |\n| **Rule 3** | **起點與終點（Start & End Points）** | $K=0$ 起於開迴路極點 $-p_i$；$K\\to\\infty$ 終於有限零點 $-z_j$ | 共有 $n - M$ 條分支在 $K\\to\\infty$ 時趨向無限遠 $\\infty$ |\n| **Rule 4** | **漸近線（Asymptotes）** | 重心 $\\sigma_A = \\frac{\\sum(-p_i) - \\sum(-z_j)}{n - M}$ (6-12)<br>角度 $\\Phi_A = \\frac{2q+1}{n-M}180^\\circ, \\; q=0,\\dots,n-M-1$ (6-13) | 常見角度：<br>$n-M=2 \\implies \\pm 90^\\circ$<br>$n-M=3 \\implies \\pm 60^\\circ, 180^\\circ$<br>$n-M=4 \\implies \\pm 45^\\circ, \\pm 135^\\circ$ |\n| **Rule 5** | **實軸上的軌跡（Real-Axis Segments）** | 實軸上某點屬於根軌跡 $\\iff$ 其**右側**實數極零點總數為**奇數** | 複數共軛極零點對實軸相角貢獻互相抵銷為 $0^\\circ$，不影響奇偶計數 |\n| **Rule 6** | **分離點 / 會合點（Breakaway / Break-in）** | 聯立 $D(s)+KN(s)=0$ 與 $D'(s)+KN'(s)=0$<br>或解 $\\frac{d}{ds}\\left[-\\frac{D(s)}{N(s)}\\right] = 0$ | 解出的實根 $s$ 必須落在實軸根軌跡區段上（或保證對應之 $K > 0$）才有效 |\n| **Rule 7** | **離開角與進入角（Departure & Arrival Angles）** | 套用相角條件：$\\sum \\angle(s+z_j) - \\sum \\angle(s+p_i) = 180^\\circ$ | 計算複數極點 $p_k$ 離開角：$\\theta_{\\text{dep}} = 180^\\circ + \\sum \\angle(p_k+z_j) - \\sum_{i\\neq k}\\angle(p_k+p_i)$ |\n| **Rule 8** | **與虛軸交點（Imaginary Axis Crossing）** | 將 $D(s) + KN(s) = 0$ 排入 **Routh 表** | 令 $s^1$ 列為 0 求臨界增益 $K_{cr}$，再由上方 $s^2$ 輔助多項式 $U(s)=0$ 求交點頻率 $\\pm j\\omega$ |\n| **Rule 9** | **特定極點之增益計算（Gain at $s^*$）** | $K = \\frac{-D(s^*)}{N(s^*)} = \\frac{1}{|G(s^*)|}$ | 決定 $K$ 後，即可代入 $K_p, K_v, K_a$ 算出閉迴路系統之穩態誤差 |\n\n## 關聯知識節點（Cross-References）\n- [[ch06-root-locus|Chapter 6: 根軌跡法控制器設計]]\n- [[routh-hurwitz-criterion|概念卡：羅斯-赫維茲判據]]\n- [[second-order-performance-indices|概念卡：二階系統暫態性能指標]]\n", "path": "wiki/concepts/root-locus-construction-rules.md"}, {"id": "bode-plot-and-stability-margins", "title": "波德圖漸近線速繪、增益/相位邊限與奈奎斯特判據 (Bode Plot & Stability Margins)", "category": "concept", "chapter": "Chapter 7", "source_pages": "pp. 40–47", "updated": "2026-11-14", "tags": ["波德圖", "漸近線", "轉折頻率", "增益邊限", "相位邊限", "奈奎斯特判據"], "related": ["ch07-frequency-response", "system-type-and-error-constants", "ch04-stability"], "body": "# 波德圖漸近線速繪、增益/相位邊限與奈奎斯特判據 (Bode Plot & Stability Margins)\n\n> **核心摘要**：本概念卡彙整 [[ch07-frequency-response|Chapter 7]] 頻率響應分析的三大實戰工具：**基本因子波德圖漸近線法則**、**相對穩定度指標（GM 與 PM）與時域阻尼比 $\\zeta$ 的轉換關係**，以及**奈奎斯特圍繞判據（Nyquist Encirclement Criterion）**。\n\n## 1. 波德圖基本因子漸近線速查表（pp. 40–42, Fig. 7-8 & 7-9）\n\n| 基本因子型式 | 轉折頻率 $\\omega_c$ | 低頻大小漸近線（$\\omega \\ll \\omega_c$） | 高頻大小漸近線斜率（$\\omega \\gg \\omega_c$） | 相角變化範圍（$\\omega: 0 \\to \\infty$） | 轉折點修正量 |\n| :--- | :--- | :--- | :--- | :--- | :--- |\n| **純微分 $s$** | 無（過 $(1, 0\\text{ dB})$） | $+20\\text{ dB/dec}$ 直線 | $+20\\text{ dB/dec}$ | 恆為 $+90^\\circ$ | 無誤差 |\n| **純積分 $\\frac{1}{s}$** | 無（過 $(1, 0\\text{ dB})$） | $-20\\text{ dB/dec}$ 直線 | $-20\\text{ dB/dec}$ | 恆為 $-90^\\circ$ | 無誤差 |\n| **一階零點 $(1 + \\frac{s}{a})$** | $\\omega_c = a$ | $0\\text{ dB}$ 水平線 | **$+20\\text{ dB/dec}$** | $0^\\circ \\to +90^\\circ$（於 $\\omega=a$ 處為 $+45^\\circ$） | 於 $\\omega=a$ 處 $+3\\text{ dB}$ |\n| **一階極點 $\\frac{1}{1 + s/a}$** | $\\omega_c = a$ | $0\\text{ dB}$ 水平線 | **$-20\\text{ dB/dec}$** | $0^\\circ \\to -90^\\circ$（於 $\\omega=a$ 處為 $-45^\\circ$） | 於 $\\omega=a$ 處 $-3\\text{ dB}$ |\n| **二階共軛極點 $\\frac{1}{1 + \\frac{2\\zeta}{\\omega_n}s + \\frac{s^2}{\\omega_n^2}}$** | $\\omega_c = \\omega_n$ | $0\\text{ dB}$ 水平線 | **$-40\\text{ dB/dec}$** | $0^\\circ \\to -180^\\circ$（於 $\\omega=\\omega_n$ 處為 $-90^\\circ$） | 於 $\\omega=\\omega_n$ 處 $-20\\log_{10}(2\\zeta)$ |\n\n## 2. 增益邊限（GM）與相位邊限（PM）計算與時域轉換（pp. 44–45, Fig. 7-12 & 7-13）\n\n1. **相位穿越頻率 $\\omega^*$ 與增益邊限 $GM$**：\n   - 先解 $\\angle G(j\\omega^*) = -180^\\circ$ 求得 $\\omega^*$。\n   - 計算 $GM = -20\\log_{10}|G(j\\omega^*)|\\text{ (dB)}$。若 $|G(j\\omega^*)| < 1$（位於 $0\\text{ dB}$ 線下方），則 $GM > 0\\text{ dB}$（具正穩定裕度）。\n2. **增益穿越頻率 $\\omega_g$ 與相位邊限 $\\phi_{pm}$**：\n   - 先解 $|G(j\\omega_g)| = 1$（即 $20\\log_{10}|G(j\\omega_g)| = 0\\text{ dB}$）求得 $\\omega_g$。\n   - 計算 $\\phi_{pm} = 180^\\circ + \\angle G(j\\omega_g)$。\n3. **頻域指標轉換為時域性能（標準二階系統近似, p. 45）**：\n   - **阻尼比與相位邊限**：\n     $$\\zeta \\approx 0.01 \\phi_{pm} \\quad (\\text{例如 } \\phi_{pm} = 45^\\circ \\implies \\zeta \\approx 0.45)$$\n   - **頻寬與安定時間**：常用增益穿越頻率 $\\omega_g$ 近似閉迴路頻寬 $\\omega_{BW}$，且 $\\omega_{BW}$ 愈大，暫態安定時間 $T_s$ 愈小。\n\n## 3. 奈奎斯特圍繞判據三定律（Nyquist Mapping Properties, pp. 46–47, Fig. 7-15 & 7-16）\n將複數 $s$ 平面上順時針（Clockwise, CW）封閉路徑透過轉移函數 $F(s)$ 映射至 $F$ 平面：\n1. 若順時針路徑**未包圍** $F(s)$ 的任何極點與零點 $\\implies$ 映射軌跡亦為順時針且**不包圍原點**。\n2. 若順時針路徑包圍了 $F(s)$ 的 **1 個零點** $\\implies$ 映射軌跡將**順時針（CW）包圍原點 1 圈**。\n3. 若順時針路徑包圍了 $F(s)$ 的 **1 個極點** $\\implies$ 映射軌跡將**逆時針（CCW）包圍原點 1 圈**。\n\n應用至閉迴路特徵函數 $F(s) = 1 + G(s)$（其零點即為閉迴路極點，其極點即為開迴路極點），並將對 $1+G(s)$ 原點的包圍平移為對 $G(s)$ 平面 **$(-1, 0)$ 點**的包圍，即得**奈奎斯特穩定判據**：\n> **閉迴路系統穩定 $\\iff$ $G(s)$ 的奈奎斯特圖逆時針（CCW）包圍 $(-1, 0)$ 點的次數 $N$，恰好等於開迴路系統 $G(s)$ 位於右半平面（RHP）的極點數！**\n\n## 關聯知識節點（Cross-References）\n- [[ch07-frequency-response|Chapter 7: 頻率響應法、波德圖與奈奎斯特判據]]\n- [[system-type-and-error-constants|概念卡：系統型別與誤差常數]]\n- [[ch04-stability|Chapter 4: 穩定度分析]]", "raw": "---\nid: bode-plot-and-stability-margins\ntitle: \"波德圖漸近線速繪、增益/相位邊限與奈奎斯特判據 (Bode Plot & Stability Margins)\"\ncategory: concept\nchapter: \"Chapter 7\"\nsource_pages: \"pp. 40–47\"\nupdated: 2026-11-14\ntags: [波德圖, 漸近線, 轉折頻率, 增益邊限, 相位邊限, 奈奎斯特判據]\nrelated: [ch07-frequency-response, system-type-and-error-constants, ch04-stability]\n---\n\n# 波德圖漸近線速繪、增益/相位邊限與奈奎斯特判據 (Bode Plot & Stability Margins)\n\n> **核心摘要**：本概念卡彙整 [[ch07-frequency-response|Chapter 7]] 頻率響應分析的三大實戰工具：**基本因子波德圖漸近線法則**、**相對穩定度指標（GM 與 PM）與時域阻尼比 $\\zeta$ 的轉換關係**，以及**奈奎斯特圍繞判據（Nyquist Encirclement Criterion）**。\n\n## 1. 波德圖基本因子漸近線速查表（pp. 40–42, Fig. 7-8 & 7-9）\n\n| 基本因子型式 | 轉折頻率 $\\omega_c$ | 低頻大小漸近線（$\\omega \\ll \\omega_c$） | 高頻大小漸近線斜率（$\\omega \\gg \\omega_c$） | 相角變化範圍（$\\omega: 0 \\to \\infty$） | 轉折點修正量 |\n| :--- | :--- | :--- | :--- | :--- | :--- |\n| **純微分 $s$** | 無（過 $(1, 0\\text{ dB})$） | $+20\\text{ dB/dec}$ 直線 | $+20\\text{ dB/dec}$ | 恆為 $+90^\\circ$ | 無誤差 |\n| **純積分 $\\frac{1}{s}$** | 無（過 $(1, 0\\text{ dB})$） | $-20\\text{ dB/dec}$ 直線 | $-20\\text{ dB/dec}$ | 恆為 $-90^\\circ$ | 無誤差 |\n| **一階零點 $(1 + \\frac{s}{a})$** | $\\omega_c = a$ | $0\\text{ dB}$ 水平線 | **$+20\\text{ dB/dec}$** | $0^\\circ \\to +90^\\circ$（於 $\\omega=a$ 處為 $+45^\\circ$） | 於 $\\omega=a$ 處 $+3\\text{ dB}$ |\n| **一階極點 $\\frac{1}{1 + s/a}$** | $\\omega_c = a$ | $0\\text{ dB}$ 水平線 | **$-20\\text{ dB/dec}$** | $0^\\circ \\to -90^\\circ$（於 $\\omega=a$ 處為 $-45^\\circ$） | 於 $\\omega=a$ 處 $-3\\text{ dB}$ |\n| **二階共軛極點 $\\frac{1}{1 + \\frac{2\\zeta}{\\omega_n}s + \\frac{s^2}{\\omega_n^2}}$** | $\\omega_c = \\omega_n$ | $0\\text{ dB}$ 水平線 | **$-40\\text{ dB/dec}$** | $0^\\circ \\to -180^\\circ$（於 $\\omega=\\omega_n$ 處為 $-90^\\circ$） | 於 $\\omega=\\omega_n$ 處 $-20\\log_{10}(2\\zeta)$ |\n\n## 2. 增益邊限（GM）與相位邊限（PM）計算與時域轉換（pp. 44–45, Fig. 7-12 & 7-13）\n\n1. **相位穿越頻率 $\\omega^*$ 與增益邊限 $GM$**：\n   - 先解 $\\angle G(j\\omega^*) = -180^\\circ$ 求得 $\\omega^*$。\n   - 計算 $GM = -20\\log_{10}|G(j\\omega^*)|\\text{ (dB)}$。若 $|G(j\\omega^*)| < 1$（位於 $0\\text{ dB}$ 線下方），則 $GM > 0\\text{ dB}$（具正穩定裕度）。\n2. **增益穿越頻率 $\\omega_g$ 與相位邊限 $\\phi_{pm}$**：\n   - 先解 $|G(j\\omega_g)| = 1$（即 $20\\log_{10}|G(j\\omega_g)| = 0\\text{ dB}$）求得 $\\omega_g$。\n   - 計算 $\\phi_{pm} = 180^\\circ + \\angle G(j\\omega_g)$。\n3. **頻域指標轉換為時域性能（標準二階系統近似, p. 45）**：\n   - **阻尼比與相位邊限**：\n     $$\\zeta \\approx 0.01 \\phi_{pm} \\quad (\\text{例如 } \\phi_{pm} = 45^\\circ \\implies \\zeta \\approx 0.45)$$\n   - **頻寬與安定時間**：常用增益穿越頻率 $\\omega_g$ 近似閉迴路頻寬 $\\omega_{BW}$，且 $\\omega_{BW}$ 愈大，暫態安定時間 $T_s$ 愈小。\n\n## 3. 奈奎斯特圍繞判據三定律（Nyquist Mapping Properties, pp. 46–47, Fig. 7-15 & 7-16）\n將複數 $s$ 平面上順時針（Clockwise, CW）封閉路徑透過轉移函數 $F(s)$ 映射至 $F$ 平面：\n1. 若順時針路徑**未包圍** $F(s)$ 的任何極點與零點 $\\implies$ 映射軌跡亦為順時針且**不包圍原點**。\n2. 若順時針路徑包圍了 $F(s)$ 的 **1 個零點** $\\implies$ 映射軌跡將**順時針（CW）包圍原點 1 圈**。\n3. 若順時針路徑包圍了 $F(s)$ 的 **1 個極點** $\\implies$ 映射軌跡將**逆時針（CCW）包圍原點 1 圈**。\n\n應用至閉迴路特徵函數 $F(s) = 1 + G(s)$（其零點即為閉迴路極點，其極點即為開迴路極點），並將對 $1+G(s)$ 原點的包圍平移為對 $G(s)$ 平面 **$(-1, 0)$ 點**的包圍，即得**奈奎斯特穩定判據**：\n> **閉迴路系統穩定 $\\iff$ $G(s)$ 的奈奎斯特圖逆時針（CCW）包圍 $(-1, 0)$ 點的次數 $N$，恰好等於開迴路系統 $G(s)$ 位於右半平面（RHP）的極點數！**\n\n## 關聯知識節點（Cross-References）\n- [[ch07-frequency-response|Chapter 7: 頻率響應法、波德圖與奈奎斯特判據]]\n- [[system-type-and-error-constants|概念卡：系統型別與誤差常數]]\n- [[ch04-stability|Chapter 4: 穩定度分析]]\n", "path": "wiki/concepts/bode-plot-and-stability-margins.md"}], "agents_md": "# AGENTS.md — 自動控制 (I) LLM Wiki 知識庫與互動講義網站規範\n\n> **專案名稱**：Automatic Control (I) LLM Wiki — 自動控制 (I) 數位知識庫與互動式學習網站  \n> **作者**：國立中正大學 機械工程學系四年級（中正機械四）廖紹強（學號：412422092）  \n> **知識來源**：國立中正大學機械工程學系 陳世樂教授《Automatic Control (I)》課程講義（共 7 章、47 頁）  \n> **架構模式**：Andrej Karpathy LLM Wiki 三層知識庫架構（`raw/` + `wiki/` + `AGENTS.md`/`CLAUDE.md` Schema）\n\n---\n\n## 1. 專案目的（Project Purpose）\n\n本專案旨在解決傳統 RAG（檢索增強生成）每次提問都必須重新拼湊碎片、知識無法累積的問題。透過 **LLM Wiki 模式**，讓 AI Agent 扮演「知識庫維護者（Wiki Maintainer）」，將《Automatic Control (I)》原始課程講義（`raw/`）逐步編譯、拆解並交叉連結為結構化的持久知識庫（`wiki/`），同時同步渲染至可公開瀏覽的 **互動式課程知識庫網頁（`index.html`）**。\n\n本專案的核心目標：\n1. **累積式個人知識庫**：將自動控制七大核心章節（緒論、數學模型、系統動態與暫態性能、穩定度分析、穩態誤差、根軌跡法、頻率響應法）轉化為具備雙向連結（`[[Wiki Links]]`）與 YAML Frontmatter 的結構化筆記。\n2. **規則驅動開發（Harness Engineering）**：定義明確的目錄結構、命名規則、標準作業流程（Ingest / Query / Lint / Sync Web），使任何 AI Agent（Claude Code、OpenAI Codex、Gemini CLI / Antigravity、Cursor）讀取本檔案後，都能以完全一致的標準繼續新增章節、擴充概念條目或更新網頁內容。\n3. **理論與互動視覺化結合**：在前端網頁整合 **Markdown 知識庫瀏覽器**、**互動式知識關聯圖譜（Knowledge Graph）** 與 **控制系統動態模擬器（一階/二階步階響應、Routh 表檢測、波德圖漸近線）**，達成可立即在 GitHub Pages 瀏覽與複習的學習成果。\n\n---\n\n## 2. 三層系統架構與目錄規範（Architecture & Directory Structure）\n\n本專案嚴格遵循 LLM Wiki 三層架構，檔案命名與放置規則如下：\n\n```text\nauto-control-wiki/\n├── AGENTS.md                  # [Schema 層] 通用 AI Agent 規則、工作流與開發規範（主設定檔）\n├── CLAUDE.md                  # [Schema 層] Claude Code 專用規則設定檔（與 AGENTS.md 同步）\n├── GEMINI.md                  # [Schema 層] Gemini / Antigravity 專用規則設定檔\n├── index.html                 # [Web 展示層] GitHub Pages 主網頁（整合 Wiki 檢視、知識圖譜與互動模擬）\n├── README.md                  # 專案說明、架構導覽與本地端/GitHub Pages 執行指南\n├── SUBMISSION.md              # 課程作業繳交格式整理（含專案簡介、連結與規則延伸說明）\n├── raw/                       # [Layer 1: Raw Sources 原始資料層]（唯讀、不可修改）\n│   ├── Automatic_Control_I_2026.pdf   # 陳世樂教授《Automatic Control (I)》47頁完整講義\n│   └── llm-wiki-pattern.md            # LLM Wiki 架構設計理念文件\n└── wiki/                      # [Layer 2: The Wiki 知識庫層]（由 AI 全權建立與維護）\n    ├── index.md               # 知識庫總目錄（依「章節總覽」與「核心概念」分類索引）\n    ├── log.md                 # 時間軸維護日誌（Append-only，紀錄每次 ingest / query / lint）\n    ├── chapters/              # 章節筆記目錄（命名格式：ch0X-kebab-case-name.md）\n    │   ├── ch01-introduction.md\n    │   ├── ch02-mathematical-model.md\n    │   ├── ch03-system-dynamics-transient.md\n    │   ├── ch04-stability.md\n    │   ├── ch05-steady-state-error.md\n    │   ├── ch06-root-locus.md\n    │   └── ch07-frequency-response.md\n    └── concepts/              # 跨章節核心概念卡片（命名格式：kebab-case-concept.md）\n        ├── transfer-function-and-causality.md\n        ├── second-order-performance-indices.md\n        ├── effects-of-zeros-and-dominant-poles.md\n        ├── routh-hurwitz-criterion.md\n        ├── system-type-and-error-constants.md\n        ├── root-locus-construction-rules.md\n        └── bode-plot-and-stability-margins.md\n```\n\n### 檔案命名與放置鐵則：\n1. **`raw/` 絕對唯讀原則**：所有新放入的教材 PDF、考古題、MATLAB 腳本或課堂筆記圖檔一律放入 `raw/`。AI **絕對不可修改或刪除** `raw/` 內的任何檔案。\n2. **章節頁面命名**：一律放置於 `wiki/chapters/`，檔名採用 `ch{兩位數章節}-{英文小寫連字號}.md`（例如新增第 8 章狀態空間分析，應命名為 `wiki/chapters/ch08-state-space-analysis.md`）。\n3. **概念頁面命名**：一律放置於 `wiki/concepts/`，檔名採用 `{英文小寫連字號}.md`（例如新增 PID 控制器調校，應命名為 `wiki/concepts/pid-controller-tuning.md`）。\n\n---\n\n## 3. 新增內容時必須遵守的格式（Content & Page Formatting Rules）\n\n### 3.1 Wiki Markdown 頁面格式規範\n每一篇位於 `wiki/chapters/` 或 `wiki/concepts/` 的 Markdown 檔案，**必須**包含以下結構：\n\n1. **YAML Frontmatter（必備標頭）**：\n   ```yaml\n   ---\n   id: ch03-system-dynamics-transient\n   title: \"Chapter 3: 系統動態與暫態性能 (System Dynamics and Transient Performance)\"\n   category: chapter          # 僅限 chapter | concept | comparison | example\n   chapter: \"Chapter 3\"\n   source_pages: \"pp. 9–20\"   # 明確標註對應 raw/Automatic_Control_I_2026.pdf 之頁碼\n   updated: 2026-11-14\n   tags: [一階系統, 二階系統, 阻尼比, 暫態性能指標, 超越量]\n   related: [ch02-mathematical-model, second-order-performance-indices, effects-of-zeros-and-dominant-poles]\n   ---\n   ```\n2. **頁面內容區塊順序**：\n   - **`# 標題`**：清楚標示中英文主題名稱。\n   - **`> 核心摘要（Executive Summary）`**：以 2–3 句話總結該頁在自動控制系統設計中的物理意義與定位。\n   - **`## 核心理論與數學推導`**：完整呈現講義推導過程，所有數學公式必須使用標準 LaTeX 語法（行內公式 `$G(s) = \\frac{N(s)}{D(s)}$`，獨立公式區塊 `$$ ... $$`），並保留講義公式編號（如 `Eq. (3-24)`）。\n   - **`## 物理意義與工程直覺`**：用機械與控制工程語言解釋公式背後的物理現象（如極點實部決定指數衰減包絡線、虛部決定振盪頻率）。\n   - **`## 典型例題與習題解析`**：收錄講義中的 `Example` 與 `Exercise`（如進給驅動系統、溫度計液柱、RLC 電路、標準二階步階響應判讀）。\n   - **`## 關聯知識節點（Cross-References）`**：使用雙向連結語法 `[[page-id|顯示名稱]]` 串聯前後章節與核心概念。\n\n### 3.2 `wiki/index.md` 與 `wiki/log.md` 維護格式\n- **`wiki/index.md`**：為內容導向的總目錄，分為「章節講義筆記（Chapters）」與「核心觀念卡片（Concepts）」兩大表格，包含頁面連結、對應 PDF 頁碼、一句話摘要與標籤。每次新增或修改頁面時**必須同步更新**。\n- **`wiki/log.md`**：為時間軸導向的唯讀追加紀錄（Append-only）。每筆紀錄開頭必須嚴格採用格式：\n  ```markdown\n  ## [YYYY-MM-DD] <operation> | <Title or Summary>\n  - **影響檔案**：列出新增或更新的檔案路徑\n  - **變更摘要**：說明本次萃取、查詢或健檢的重點\n  ```\n  其中 `<operation>` 僅限 `init`、`ingest`、`query`、`lint`、`web-sync`。此格式確保可用 `grep \"^## \\[\" wiki/log.md | tail -5` 快速解析最近 5 筆操作。\n\n---\n\n## 4. 網頁的整體風格與頁面結構（Web Style & UI Structure）\n\n主網頁 `index.html` 為單一自包含（Self-contained）互動式知識庫網站，設計風格與結構規範如下：\n\n1. **整體視覺風格（Academic Engineering Dark & Clean Tech）**：\n   - 採用深色科技導航列搭配高對比清晰閱讀區（支援深淺主題切換），主色調為 **工程靛藍（Indigo `#4f46e5`）**、**控制系統青（Cyan `#06b6d4`）** 與 **穩定度翠綠（Emerald `#10b981`）**。\n   - 數學公式透過 KaTeX 渲染為出版級排版；方塊圖與圖譜採用高解析 SVG 繪製。\n2. **四大核心頁面結構（Navigation Tabs）**：\n   - **📚 知識庫閱讀器（Wiki Reader）**：左側為章節與概念分類側邊欄 + 即時關鍵字搜尋框；中央為筆記本文區（顯示 YAML 標籤、對應講義頁碼、LaTeX 公式、例題解析與底部雙向關聯卡片）；點擊任何關聯卡片可無縫跳轉至對應條目。\n   - **🕸️ 知識關聯圖譜（Obsidian Graph View）**：以互動式節點網路圖呈現 7 大章節與 7 大核心概念之間的雙向連結關係，點擊節點即可預覽摘要並開啟該篇筆記。\n   - **🎛️ 控制系統互動實驗室（Interactive Control Lab）**：\n     - **二階系統步階響應與極點分佈模擬器**：即時調整阻尼比 $\\zeta$ 與自然頻率 $\\omega_n$，動態繪製 $y(t)$ 步階響應曲線、$s$ 平面極點位置（LHP），並自動計算上升時間 $T_r$、峰值時間 $T_p$、2% 安定時間 $T_s$ 與最大超越量 $\\%OS$。\n     - **波德圖（Bode Plot）與頻域穩定度模擬器**：動態呈現增益圖（dB）與相位圖（deg）及轉折頻率特性。\n     - **羅斯-赫維茲（Routh-Hurwitz）穩定度檢驗器**：輸入特徵多項式係數（內建講義範例與習題預設按鈕），自動生成 Routh 表並判讀右半平面（RHP）極點數。\n   - **🤖 Agent 規則與維護日誌（Schema & Log Viewer）**：直接在網頁上檢視 `AGENTS.md` 開發規範、`wiki/index.md` 總索引表與 `wiki/log.md` 演進紀錄。\n\n---\n\n## 5. AI 修改或新增內容時需要遵守的操作工作流（AI Operational Workflows）\n\n當使用者對 AI Agent 下達指令時，請依照以下四大標準流程執行：\n\n### 流程 A：`Ingest`（消化新教材或新章節）\n1. **讀取原始檔**：從 `raw/` 讀取新增的教材、講義頁碼或補充筆記（絕不修改 `raw/` 原檔）。\n2. **更新或建立 Wiki 頁面**：\n   - 若為新章節，於 `wiki/chapters/` 建立 `chXX-*.md`；若為深入專題（如 Lead-Lag 補償器、Nyquist 圍繞判據），於 `wiki/concepts/` 建立概念卡。\n   - 在既有相關頁面的 `related` 欄位與文末「關聯知識節點」加入雙向連結，若有新資訊修正或補充舊頁面，直接更新舊頁面並註記來源頁碼。\n3. **更新索引與日誌**：在 `wiki/index.md` 新增條目，並在 `wiki/log.md` 附加一筆 `## [YYYY-MM-DD] ingest | ...` 紀錄。\n4. **同步網頁資料**：將新頁面的結構化資料同步寫入 `index.html` 內的 `WIKI_PAGES` 陣列與知識圖譜邊集（Edges），確保網頁即時呈現最新知識庫。\n\n### 流程 B：`Query`（知識庫問答與知識回存）\n1. **優先查閱索引**：先讀取 `wiki/index.md` 鎖定相關章節與概念頁，再深入閱讀對應的 `.md` 檔案。\n2. **附帶明確引用回答**：回答時必須標註知識庫頁面與原始講義頁碼（例如：`參見 [[ch04-stability]] 與講義 pp. 24–26`）。\n3. **高價值解答回存（File Back to Wiki）**：若使用者的提問產生了跨章節綜合比較（如「時域性能指標 vs. 頻域性能指標對照表」或新習題詳解），應主動將該解答整理為新的概念頁存入 `wiki/concepts/`，並更新 `index.md`、`log.md` 與 `index.html`。\n\n### 流程 C：`Lint`（知識庫健康度檢查）\n定期執行以下檢查並記錄於 `wiki/log.md`：\n1. **孤兒頁面檢查（Orphan Check）**：確保每篇 `wiki/` 頁面至少有 2 個雙向關聯連結，無孤立節點。\n2. **符號與公式一致性檢查**：確保全庫統一使用講義符號（如轉移函數 $G(s)$、閉迴路轉移函數 $T(s)$、阻尼比 $\\zeta$、自然頻率 $\\omega_n$、誤差常數 $K_p, K_v, K_a$）。\n3. **網頁同步檢查**：確認 `wiki/` 目錄下的所有 Markdown 頁面皆已完整映射至 `index.html` 的前端知識庫中。\n", "index_md": "# 自動控制 (I) LLM Wiki 知識庫總目錄 (`index.md`)\n\n> 本檔案為內容導向（Content-oriented）的知識庫總索引，由 AI Agent 依據 `AGENTS.md` / `CLAUDE.md` 規範自動維護。每次執行 `Ingest` 或將高價值 `Query` 回存時，皆會同步更新本目錄。  \n> **知識來源**：`raw/Automatic_Control_I_2026.pdf`（國立中正大學機械系 陳世樂教授《Automatic Control (I)》講義，pp. 1–47）\n\n---\n\n## 一、章節講義筆記（Chapters, `wiki/chapters/`）\n\n| 頁面 ID 與連結 | 對應章節 | 原始講義頁碼 | 核心內容一句話摘要 | 關鍵標籤 |\n| :--- | :--- | :---: | :--- | :--- |\n| [[ch01-introduction]] (`chapters/ch01-introduction.md`) | Chapter 1 | pp. 1–3 | 定義 SISO/MIMO、受控體與控制器、開迴路與閉迴路迴授架構，以及三大設計要求與六大設計步驟。 | `SISO`, `閉迴路`, `設計流程` |\n| [[ch02-mathematical-model]] (`chapters/ch02-mathematical-model.md`) | Chapter 2 | pp. 4–8 | 以單軸滾珠螺桿進給驅動系統推導機電耦合微分方程，建立拉氏轉換、轉移函數 $G(s)$ 與方塊圖化簡。 | `進給驅動`, `拉氏轉換`, `轉移函數` |\n| [[ch03-system-dynamics-transient]] (`chapters/ch03-system-dynamics-transient.md`) | Chapter 3 | pp. 9–20 | 剖析一階系統時間常數 $\\tau$ 與標準二階系統四種阻尼響應，推導 $T_r, T_p, T_s, \\%OS$、零點效應與主導極點。 | `時間常數`, `阻尼比`, `暫態性能` |\n| [[ch04-stability]] (`chapters/ch04-stability.md`) | Chapter 4 | pp. 21–26 | 定義 BIBO 穩定度、絕對與相對穩定度，連結 $s$ 平面極點位置與穩定性，並推導 Routh-Hurwitz 判據。 | `BIBO穩定度`, `LHP`, `羅斯表` |\n| [[ch05-steady-state-error]] (`chapters/ch05-steady-state-error.md`) | Chapter 5 | pp. 27–32 | 針對步階、斜坡與拋物線三大測試信號定義靜態誤差常數 $K_p, K_v, K_a$ 與系統型別 Type $N$，分析 PI 控制器權衡。 | `穩態誤差`, `系統型別`, `PI控制` |\n| [[ch06-root-locus]] (`chapters/ch06-root-locus.md`) | Chapter 6 | pp. 33–36 | 建立閉迴路極點隨增益 $K$ 變化的大小條件與相角條件，系統化歸納根軌跡繪製九大法則（Rule 1~9）。 | `根軌跡`, `相角條件`, `PID控制器` |\n| [[ch07-frequency-response]] (`chapters/ch07-frequency-response.md`) | Chapter 7 | pp. 37–47 | 由傅立葉轉換導出正弦穩態頻率響應 $G(j\\omega)$，涵蓋波德圖漸近線、頻寬、增益/相位邊限與奈奎斯特判據。 | `波德圖`, `相位邊限`, `奈奎斯特判據` |\n\n---\n\n## 二、跨章節核心概念卡片（Concepts, `wiki/concepts/`）\n\n| 頁面 ID 與連結 | 關聯章節 | 原始講義頁碼 | 核心內容一句話摘要 | 關鍵標籤 |\n| :--- | :--- | :---: | :--- | :--- |\n| [[transfer-function-and-causality]] (`concepts/transfer-function-and-causality.md`) | Chapter 2, 7 | pp. 6–8, 43 | 解析真分（Proper）、嚴格真分與假分（Improper）轉移函數，並證明假分系統為何違反物理因果性（Causality）。 | `因果性`, `真分性`, `微分器` |\n| [[second-order-performance-indices]] (`concepts/second-order-performance-indices.md`) | Chapter 3, 6 | pp. 13–17 | 彙整二階系統四大暫態指標公式、$s$ 平面極點三大幾何不變律（等實部、等虛部、等極角）與圖形反推實例。 | `超越量`, `安定時間`, `極點幾何` |\n| [[effects-of-zeros-and-dominant-poles]] (`concepts/effects-of-zeros-and-dominant-poles.md`) | Chapter 3, 7 | pp. 17–20, 43 | 解析左半平面零點拉高超越量、右半平面零點（非最小相位）引發反向 Undershoot，以及 p.20 六組步階響應配對詳解。 | `零點效應`, `下衝`, `主導極點` |\n| [[routh-hurwitz-criterion]] (`concepts/routh-hurwitz-criterion.md`) | Chapter 4, 6 | pp. 24–26, 36 | 詳列 Routh 表行列式計算公式，以及首項為 0（$\\varepsilon$ 極限法）與整列為 0（輔助多項式 $U(s)$ 法）兩大特殊情況。 | `Routh表`, `輔助多項式`, `虛軸根` |\n| [[system-type-and-error-constants]] (`concepts/system-type-and-error-constants.md`) | Chapter 5, 7 | pp. 29–31, 45–46 | 跨章節整合時域終值定理與頻域波德圖低頻斜率（$0, -20, -40\\text{ dB/dec}$）對 Type 0/1/2 誤差常數的雙重解析。 | `Type N`, `Kp/Kv/Ka`, `低頻漸近線` |\n| [[root-locus-construction-rules]] (`concepts/root-locus-construction-rules.md`) | Chapter 6 | pp. 35–36 | 整理根軌跡九大繪製法則（分支、對稱、實軸區間、漸近線重心與角度、分離點、離開角、虛軸交點、增益計算）速查表。 | `九大法則`, `漸近線`, `分離點` |\n| [[bode-plot-and-stability-margins]] (`concepts/bode-plot-and-stability-margins.md`) | Chapter 7 | pp. 40–47 | 彙整一階/二階因子波德圖漸近線斜率、增益邊限 GM 與相位邊限 PM 計算、$\\zeta \\approx 0.01\\phi_{pm}$ 近似與奈奎斯特判據。 | `Bode漸近線`, `GM/PM`, `Nyquist` |\n", "log_md": "# 自動控制 (I) LLM Wiki 維護日誌 (`log.md`)\n\n> 本檔案為時間軸導向（Chronological, Append-only）的操作紀錄。每筆紀錄均以 `## [YYYY-MM-DD] <operation> | <Title>` 開頭，可使用 `grep \"^## \\[\" wiki/log.md | tail -5` 快速檢視最近 5 筆維護紀錄。\n\n---\n\n## [2026-11-14] init | 建立自動控制 (I) LLM Wiki 三層架構與 AGENTS.md 規範\n- **影響檔案**：`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `wiki/index.md`, `wiki/log.md`, `raw/Automatic_Control_I_2026.pdf`, `raw/llm-wiki-pattern.md`\n- **變更摘要**：依據 Andrej Karpathy LLM Wiki 模式與課程作業要求，建立 `raw/`（唯讀教材層）、`wiki/`（Markdown 知識庫層）與 `AGENTS.md` / `CLAUDE.md`（Schema 規則層），定義 YAML Frontmatter、雙向連結語法與四大標準工作流（Ingest / Query / Lint / Web-Sync）。\n\n## [2026-11-14] ingest | Automatic Control (I) Ch.1–Ch.2 導論、進給驅動建模與轉移函數\n- **影響檔案**：`wiki/chapters/ch01-introduction.md`, `wiki/chapters/ch02-mathematical-model.md`, `wiki/concepts/transfer-function-and-causality.md`, `wiki/index.md`\n- **變更摘要**：自 `raw/Automatic_Control_I_2026.pdf` (pp. 1–8) 萃取 SISO/MIMO 定義、開/閉迴路比較、控制器設計六步驟、單軸滾珠螺桿進給驅動系統（Feed Drive System）機電方程推導、拉氏轉換與轉移函數 $G(s)$，並建立「真分性與物理因果性（Causality）」概念卡。\n\n## [2026-11-14] ingest | Automatic Control (I) Ch.3 一階與二階系統動態、暫態指標與零極點效應\n- **影響檔案**：`wiki/chapters/ch03-system-dynamics-transient.md`, `wiki/concepts/second-order-performance-indices.md`, `wiki/concepts/effects-of-zeros-and-dominant-poles.md`, `wiki/index.md`\n- **變更摘要**：自 `raw/Automatic_Control_I_2026.pdf` (pp. 9–20) 萃取自由/強迫響應、一階時間常數 $\\tau$ 兩種圖解法、二階系統四種阻尼分類、暫態指標（$T_r, T_p, T_s, \\%OS$）、$s$ 平面極點幾何不變律、LHP/RHP 零點效應（含非最小相位 Undershoot）與 p. 20 六組系統步階響應配對詳解。\n\n## [2026-11-14] ingest | Automatic Control (I) Ch.4–Ch.5 BIBO 穩定度、Routh 表與穩態誤差型別\n- **影響檔案**：`wiki/chapters/ch04-stability.md`, `wiki/chapters/ch05-steady-state-error.md`, `wiki/concepts/routh-hurwitz-criterion.md`, `wiki/concepts/system-type-and-error-constants.md`, `wiki/index.md`\n- **變更摘要**：自 `raw/Automatic_Control_I_2026.pdf` (pp. 21–32) 萃取 BIBO 穩定度、麥克風正迴授嘯叫模型、Routh-Hurwitz 判據與兩大特殊情況（$\\varepsilon$ 法與輔助多項式 $U(s)$ 法）、三大測試信號、靜態誤差常數（$K_p, K_v, K_a$）、系統型別（Type 0/1/2）及 PI 控制器暫態與穩態權衡分析。\n\n## [2026-11-14] ingest | Automatic Control (I) Ch.6–Ch.7 根軌跡法九大法則、波德圖與奈奎斯特判據\n- **影響檔案**：`wiki/chapters/ch06-root-locus.md`, `wiki/chapters/ch07-frequency-response.md`, `wiki/concepts/root-locus-construction-rules.md`, `wiki/concepts/bode-plot-and-stability-margins.md`, `wiki/index.md`\n- **變更摘要**：自 `raw/Automatic_Control_I_2026.pdf` (pp. 33–47) 萃取根軌跡大小與相角條件、九大繪製法則（Rule 1–9）、傅立葉轉換與正弦穩態頻率響應、波德圖漸近線合成、頻寬 $\\omega_{BW}$、增益邊限 GM 與相位邊限 PM（含 $\\zeta \\approx 0.01\\phi_{pm}$ 近似）、頻域誤差常數讀取法與奈奎斯特圍繞判據。\n\n## [2026-11-14] lint | 全知識庫雙向連結、符號一致性與互動網頁同步健檢\n- **影響檔案**：`wiki/index.md`, `wiki/log.md`, `index.html`\n- **變更摘要**：完成 7 篇章節筆記與 7 篇核心概念卡之健康度檢查（0 孤兒頁面、38 組雙向關聯連結、LaTeX 數學符號與講義公式編號 100% 對齊），並將完整知識庫與三大互動模擬器同步編譯至 `index.html`。\n", "submission_md": "# 作業繳交內容整理（可直接複製貼上至作業繳交區）\n\n## 📌 繳交標題\n`中正 412422092 機械四 廖紹強 自動控制(I) LLM Wiki 知識庫與互動學習網站`\n\n---\n\n## 1. 專案簡介\n本專案結合 Andrej Karpathy 提出的 **LLM Wiki 三層知識庫架構（`raw/` 原始教材層 + `wiki/` 結構化雙向連結知識庫層 + `AGENTS.md`/`CLAUDE.md` 規則層）**，以國立中正大學機械工程學系陳世樂教授《Automatic Control (I)》課程講義（共 7 章、47 頁）為核心知識來源，打造一個可持續由 AI Agent 自動維護與擴充的**「自動控制 (I) 數位知識庫與互動式學習網站」**。\n\n專案成果包含：\n1. **完整的 LLM Wiki 知識庫（`wiki/`）**：涵蓋 7 大章節完整講義筆記（`wiki/chapters/ch01` ~ `ch07`）、7 張跨章節核心概念卡片（`wiki/concepts/`，包含轉移函數因果性、二階暫態性能指標、零點下衝與主導極點、羅斯-赫維茲特殊情況、系統型別與時頻域誤差常數、根軌跡九大法則、波德圖與穩定邊限），以及自動維護的總索引 `wiki/index.md` 與時間軸日誌 `wiki/log.md`。\n2. **互動式學習網站（`index.html`）**：將 LLM Wiki 完整呈現在網頁上，內建 **Markdown 知識庫閱讀器（含 KaTeX 數學公式渲染與雙向連結跳轉）**、**Obsidian 風格互動式知識關聯圖譜（Knowledge Graph）**、**控制系統互動模擬實驗室（即時調整 $\\zeta, \\omega_n$ 觀察二階步階響應與極點移動、波德圖漸近線模擬器、Routh-Hurwitz 穩定度自動檢驗器）**，以及 **`AGENTS.md` / `index.md` / `log.md` 線上檢視器**。\n\n---\n\n## 2. GitHub Repository 連結\n`https://github.com/<你的GitHub帳號>/auto-control-wiki`  \n*(上傳後請將 `<你的GitHub帳號>` 替換為你的實際 GitHub 帳號名稱)*\n\n---\n\n## 3. 網頁連結（GitHub Pages）\n`https://<你的GitHub帳號>.github.io/auto-control-wiki/`  \n*(開啟 GitHub Pages 後請替換為你的實際網址)*\n\n---\n\n## 4. `AGENTS.md` / `CLAUDE.md`\n完整設定檔已存放於專案根目錄之 [`AGENTS.md`](./AGENTS.md) 與 [`CLAUDE.md`](./CLAUDE.md)（網頁上方切換至「🤖 Agent 規則與維護日誌」分頁亦可直接瀏覽全文）。\n\n---\n\n## 5. 簡短說明：如果之後要新增一個新的頁面或內容，你設計的規則可以如何幫助 AI 繼續完成？\n\n在 `AGENTS.md`（與 `CLAUDE.md`）中，我設計了一套結構化的 **Harness Engineering 規則與四大標準作業流程（Ingest / Query / Lint / Web-Sync）**。當未來我要新增新的學習內容（例如放入《Automatic Control (II)》的「Chapter 8: 狀態空間分析 State-Space Analysis」、新的考古題 PDF，或新增「超前-落後補償器（Lead-Lag Compensator）」概念頁）時，AI 只要讀取 `AGENTS.md`，就能自動且一致地完成以下五個步驟，無須每次重新口頭交代格式：\n\n1. **嚴格的檔案分類與命名規範（Directory & Naming Rules）**：\n   AI 知道原始教材必須放入唯讀的 `raw/` 目錄不可竄改；若新增章節則依 `wiki/chapters/ch08-state-space-analysis.md` 規則命名，若新增跨章節專題則依 `wiki/concepts/lead-lag-compensator.md` 命名，確保專案結構永遠整潔一致。\n2. **統一的頁面模版與公式標準（YAML Frontmatter & Content Schema）**：\n   AI 新增任何 Markdown 筆記時，會自動套用規定的 YAML 標頭（標註 `id`、`category`、`chapter`、`source_pages` 對應頁碼、`tags` 與 `related` 關聯節點），並依序撰寫「核心摘要 → 數學推導（保留講義公式編號與 LaTeX 語法）→ 物理意義與工程直覺 → 例題解析 → 雙向連結」。\n3. **自動交叉引用與既有頁面更新（Cross-Referencing）**：\n   根據 `Ingest` 流程，AI 新增一篇筆記時，不會只產生孤立檔案，而會主動檢索並更新既有相關頁面（例如新增「狀態空間可控性」時，自動在 `ch02-mathematical-model.md` 與 `ch04-stability.md` 的 `related` 區塊補上雙向連結 `[[ch08-state-space-analysis]]`）。\n4. **自動維護索引與時間軸日誌（Indexing & Logging）**：\n   AI 會在 `wiki/index.md` 的分類表格新增該頁的一句話摘要與頁碼索引，並在 `wiki/log.md` 尾端追加一筆標準格式 `## [YYYY-MM-DD] ingest | ...` 紀錄，讓知識庫具備完整的演進歷史與可檢索性。\n5. **無縫同步至前端互動網頁（Web Synchronization）**：\n   `AGENTS.md` 明確規範了 `index.html` 內 `WIKI_PAGES` 資料結構與知識圖譜節點格式，AI 在更新完 Markdown 知識庫後，能直接將新條目同步寫入 `index.html`，讓網頁上的側邊欄目錄、知識關聯圖譜（Graph View）與搜尋引擎立即顯示新內容，真正達成「規則一次定義，知識庫與網站持續自動演進」的目標。\n"};
+
+    // Application State
+    let currentTab = 'wiki';
+    let currentFilter = 'all';
+    let currentSearch = '';
+    let currentPageId = 'ch01-introduction';
+    let currentSchemaDoc = 'agents';
+    let currentBodeMode = 'p42';
+    let stepChartInstance = null;
+    let bodeMagChartInstance = null;
+    let bodePhaseChartInstance = null;
+
+    const pageMap = {};
+    WIKI_DATA.pages.forEach(p => { pageMap[p.id] = p; });
+
+    function showToast(text) {
+      const el = document.getElementById('toast-msg');
+      el.textContent = text;
+      el.classList.remove('hidden');
+      setTimeout(() => el.classList.add('hidden'), 2400);
+    }
+
+    // Render Markdown with [[wiki-links]] and KaTeX math protection
+    function renderWikiMarkdown(mdText) {
+      const mathBlocks = [];
+      // Protect display math $$...$$
+      let processed = mdText.replace(/\$\$([\s\S]*?)\$\$/g, (m) => {
+        mathBlocks.push(m);
+        return `@@MATH_BLOCK_${mathBlocks.length - 1}@@`;
+      });
+      // Protect inline math $...$
+      processed = processed.replace(/\$([^\$\n]+?)\$/g, (m) => {
+        mathBlocks.push(m);
+        return `@@MATH_BLOCK_${mathBlocks.length - 1}@@`;
+      });
+      // Convert [[page-id|label]] or [[page-id]] into interactive chips
+      processed = processed.replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (m, targetId, label) => {
+        const tid = targetId.trim();
+        const targetPage = pageMap[tid];
+        const disp = label ? label.trim() : (targetPage ? targetPage.title : tid);
+        return `<a href="#${tid}" data-wikilink="${tid}" class="wikilink-chip">🔗 ${disp}</a>`;
+      });
+
+      let html = marked.parse(processed);
+      // Restore math blocks
+      html = html.replace(/@@MATH_BLOCK_(\d+)@@/g, (m, idx) => mathBlocks[Number(idx)]);
+      return html;
+    }
+
+    function triggerKaTeX(container) {
+      if (window.renderMathInElement) {
+        renderMathInElement(container, {
+          delimiters: [
+            { left: '$$', right: '$$', display: true },
+            { left: '$', right: '$', display: false }
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    // Attach click handlers for [[wikilinks]] inside a container
+    function bindWikiLinks(container) {
+      container.querySelectorAll('[data-wikilink]').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const targetId = link.getAttribute('data-wikilink');
+          if (pageMap[targetId]) {
+            switchMainTab('wiki');
+            selectWikiPage(targetId);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        });
+      });
+    }
+
+    // Render Left Sidebar List
+    function renderSidebar() {
+      const listEl = document.getElementById('wiki-sidebar-list');
+      const q = currentSearch.trim().toLowerCase();
+      const filtered = WIKI_DATA.pages.filter(p => {
+        if (currentFilter !== 'all' && p.category !== currentFilter) return false;
+        if (!q) return true;
+        return (
+          p.title.toLowerCase().includes(q) ||
+          p.body.toLowerCase().includes(q) ||
+          p.tags.some(t => t.toLowerCase().includes(q))
+        );
+      });
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = `<div class="p-4 text-xs text-slate-500 text-center">找不到符合「${currentSearch}」的筆記條目</div>`;
+        return;
+      }
+
+      const chapters = filtered.filter(p => p.category === 'chapter');
+      const concepts = filtered.filter(p => p.category === 'concept');
+
+      let html = '';
+      if (chapters.length > 0) {
+        html += `<div class="px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-indigo-400">📘 課程章節筆記 (Chapters)</div><div class="space-y-1 mb-3">`;
+        chapters.forEach(p => {
+          const active = p.id === currentPageId;
+          html += `
+            <button data-page-id="${p.id}" class="sidebar-page-btn w-full text-left px-3 py-2 rounded-xl text-xs transition flex flex-col gap-0.5 ${active ? 'bg-indigo-600 text-white shadow' : 'hover:bg-slate-800/80 text-slate-300'}">
+              <div class="flex items-center justify-between">
+                <span class="font-semibold truncate">${p.title.replace(/^Chapter \\d+:\\s*/, '')}</span>
+                <span class="text-[10px] font-mono ${active ? 'text-indigo-200' : 'text-slate-400'}">${p.source_pages}</span>
+              </div>
+              <span class="text-[10px] font-mono ${active ? 'text-indigo-200' : 'text-slate-400'}">${p.chapter}</span>
+            </button>`;
+        });
+        html += `</div>`;
+      }
+
+      if (concepts.length > 0) {
+        html += `<div class="px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-cyan-400">💡 跨章節核心概念卡 (Concepts)</div><div class="space-y-1">`;
+        concepts.forEach(p => {
+          const active = p.id === currentPageId;
+          html += `
+            <button data-page-id="${p.id}" class="sidebar-page-btn w-full text-left px-3 py-2 rounded-xl text-xs transition flex flex-col gap-0.5 ${active ? 'bg-cyan-600 text-white shadow' : 'hover:bg-slate-800/80 text-slate-300'}">
+              <span class="font-semibold truncate">${p.title.split('(')[0]}</span>
+              <div class="flex items-center justify-between text-[10px] font-mono ${active ? 'text-cyan-100' : 'text-slate-400'}">
+                <span>${p.chapter}</span>
+                <span>${p.source_pages}</span>
+              </div>
+            </button>`;
+        });
+        html += `</div>`;
+      }
+
+      listEl.innerHTML = html;
+      listEl.querySelectorAll('.sidebar-page-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          selectWikiPage(btn.getAttribute('data-page-id'));
+        });
+      });
+    }
+
+    // Select & Render a Wiki Page
+    function selectWikiPage(pageId) {
+      const p = pageMap[pageId];
+      if (!p) return;
+      currentPageId = pageId;
+      renderSidebar();
+
+      // Render top metadata badges
+      const metaEl = document.getElementById('article-meta');
+      const catBadge = p.category === 'chapter'
+        ? `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">📘 章節筆記 · ${p.chapter}</span>`
+        : `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">💡 核心概念卡 · ${p.chapter}</span>`;
+
+      const tagsHtml = p.tags.map(t => `<span class="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 text-[11px]">#${t}</span>`).join(' ');
+
+      metaEl.innerHTML = `
+        <div class="flex flex-wrap items-center gap-2">
+          ${catBadge}
+          <span class="px-2.5 py-0.5 rounded-full text-xs font-mono bg-amber-500/15 text-amber-300 border border-amber-500/30">📄 講義頁碼：${p.source_pages}</span>
+          <span class="text-xs font-mono text-slate-400">更新：${p.updated}</span>
+        </div>
+        <div class="flex flex-wrap gap-1.5 mt-1">${tagsHtml}</div>
+      `;
+
+      // Render Markdown body
+      const bodyEl = document.getElementById('article-body');
+      bodyEl.innerHTML = renderWikiMarkdown(p.body);
+      triggerKaTeX(bodyEl);
+      bindWikiLinks(bodyEl);
+
+      // Update Right Sidebar YAML Inspector
+      document.getElementById('meta-path-badge').textContent = p.path;
+      document.getElementById('yaml-inspector').innerHTML = `
+        <div><span class="text-indigo-400">id:</span> ${p.id}</div>
+        <div><span class="text-indigo-400">category:</span> ${p.category}</div>
+        <div><span class="text-indigo-400">chapter:</span> "${p.chapter}"</div>
+        <div><span class="text-indigo-400">source_pages:</span> "${p.source_pages}"</div>
+        <div><span class="text-indigo-400">updated:</span> ${p.updated}</div>
+        <div><span class="text-indigo-400">tags:</span> [${p.tags.join(', ')}]</div>
+      `;
+
+      // Outbound & Inbound Links
+      const outEl = document.getElementById('outbound-links');
+      outEl.innerHTML = p.related.map(rid => {
+        const rp = pageMap[rid];
+        if (!rp) return '';
+        return `<button data-wikilink="${rid}" class="w-full text-left px-2.5 py-1.5 rounded-lg bg-slate-950 hover:bg-indigo-950/60 border border-slate-800 hover:border-indigo-500/40 text-xs text-indigo-300 transition truncate">🔗 ${rp.title.split('(')[0]}</button>`;
+      }).join('') || `<span class="text-xs text-slate-500">無</span>`;
+      bindWikiLinks(outEl);
+
+      const inbound = WIKI_DATA.pages.filter(other => other.id !== p.id && other.related.includes(p.id));
+      const inEl = document.getElementById('inbound-links');
+      inEl.innerHTML = inbound.map(ip => {
+        return `<button data-wikilink="${ip.id}" class="w-full text-left px-2.5 py-1.5 rounded-lg bg-slate-950 hover:bg-cyan-950/60 border border-slate-800 hover:border-cyan-500/40 text-xs text-cyan-300 transition truncate">⬅️ ${ip.title.split('(')[0]}</button>`;
+      }).join('') || `<span class="text-xs text-slate-500">無</span>`;
+      bindWikiLinks(inEl);
+    }
+
+    // ==================== GRAPH VIEW ====================
+    const graphNodePositions = {};
+    function initGraphPositions() {
+      const chapters = WIKI_DATA.pages.filter(p => p.category === 'chapter');
+      const concepts = WIKI_DATA.pages.filter(p => p.category === 'concept');
+      // Place chapters on inner arc/left-circle and concepts on outer right-circle for crisp visibility
+      chapters.forEach((p, idx) => {
+        const angle = -Math.PI * 0.72 + (idx / (chapters.length - 1)) * (Math.PI * 1.44);
+        graphNodePositions[p.id] = {
+          x: 390 + 145 * Math.cos(angle),
+          y: 260 + 145 * Math.sin(angle)
+        };
+      });
+      concepts.forEach((p, idx) => {
+        const angle = -Math.PI * 0.78 + (idx / (concepts.length - 1)) * (Math.PI * 1.56);
+        graphNodePositions[p.id] = {
+          x: 410 + 245 * Math.cos(angle),
+          y: 260 + 215 * Math.sin(angle)
+        };
+      });
+    }
+
+    function renderKnowledgeGraph(selectedId) {
+      const svg = document.getElementById('wiki-graph-svg');
+      const activeId = selectedId || currentPageId;
+      const activePage = pageMap[activeId] || WIKI_DATA.pages[0];
+      const connectedSet = new Set([activePage.id, ...activePage.related]);
+      WIKI_DATA.pages.forEach(p => {
+        if (p.related.includes(activePage.id)) connectedSet.add(p.id);
+      });
+
+      let edgesHtml = '';
+      const drawnPairs = new Set();
+      WIKI_DATA.pages.forEach(p => {
+        const p1 = graphNodePositions[p.id];
+        p.related.forEach(rid => {
+          const p2 = graphNodePositions[rid];
+          if (!p1 || !p2) return;
+          const key = [p.id, rid].sort().join('--');
+          if (drawnPairs.has(key)) return;
+          drawnPairs.add(key);
+          const isHighlighted = (p.id === activePage.id || rid === activePage.id);
+          edgesHtml += `<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="${isHighlighted ? '#fbbf24' : '#334155'}" stroke-width="${isHighlighted ? '2.4' : '1.1'}" stroke-opacity="${isHighlighted ? '0.95' : '0.45'}" />`;
+        });
+      });
+
+      let nodesHtml = '';
+      WIKI_DATA.pages.forEach(p => {
+        const pos = graphNodePositions[p.id];
+        const isSelected = p.id === activePage.id;
+        const isNeighbor = connectedSet.has(p.id);
+        const fill = p.category === 'chapter' ? '#6366f1' : '#06b6d4';
+        const r = isSelected ? 18 : (p.category === 'chapter' ? 14 : 12);
+        const opacity = isNeighbor ? '1' : '0.35';
+        const shortLabel = p.category === 'chapter'
+          ? p.id.split('-')[0].toUpperCase()
+          : p.title.split('(')[0].slice(0, 6);
+
+        nodesHtml += `
+          <g class="graph-node cursor-pointer" data-node-id="${p.id}" opacity="${opacity}">
+            ${isSelected ? `<circle cx="${pos.x}" cy="${pos.y}" r="${r + 6}" fill="none" stroke="#fbbf24" stroke-width="2" stroke-dasharray="4 2" />` : ''}
+            <circle cx="${pos.x}" cy="${pos.y}" r="${r}" fill="${fill}" stroke="#0f172a" stroke-width="2.5" />
+            <text x="${pos.x}" y="${pos.y + r + 14}" text-anchor="middle" fill="${isSelected ? '#fbbf24' : '#e2e8f0'}" font-size="11" font-weight="${isSelected ? '700' : '500'}">${shortLabel}</text>
+          </g>`;
+      });
+
+      svg.innerHTML = edgesHtml + nodesHtml;
+
+      // Update Inspector Panel
+      document.getElementById('graph-node-badge').textContent = `${activePage.category.toUpperCase()} · ${activePage.chapter}`;
+      document.getElementById('graph-node-pages').textContent = activePage.source_pages;
+      document.getElementById('graph-node-title').textContent = activePage.title;
+      document.getElementById('graph-node-tags').textContent = '標籤：' + activePage.tags.map(t => `#${t}`).join('  ');
+
+      const linksEl = document.getElementById('graph-node-links');
+      linksEl.innerHTML = activePage.related.map(rid => {
+        const rp = pageMap[rid];
+        if (!rp) return '';
+        return `<button data-graph-select="${rid}" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-indigo-900/50 border border-slate-700 text-xs text-indigo-300">${rp.title.split('(')[0]}</button>`;
+      }).join('');
+
+      linksEl.querySelectorAll('[data-graph-select]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const nid = btn.getAttribute('data-graph-select');
+          currentPageId = nid;
+          renderKnowledgeGraph(nid);
+        });
+      });
+
+      svg.querySelectorAll('.graph-node').forEach(g => {
+        g.addEventListener('click', () => {
+          const nid = g.getAttribute('data-node-id');
+          currentPageId = nid;
+          renderKnowledgeGraph(nid);
+        });
+      });
+    }
+
+    // ==================== LAB 1: 2ND-ORDER STEP RESPONSE ====================
+    function updateStepSimulation() {
+      const zeta = parseFloat(document.getElementById('slider-zeta').value);
+      const wn = parseFloat(document.getElementById('slider-wn').value);
+      const zeroVal = parseFloat(document.getElementById('select-zero').value);
+
+      document.getElementById('val-zeta').textContent = zeta.toFixed(2);
+      document.getElementById('val-wn').textContent = wn.toFixed(2);
+
+      // Compute time series y(t) and its derivative for zero effect y(t) = c(t) + (1/z)*dc/dt
+      const tMax = 12.0;
+      const N = 240;
+      const dt = tMax / N;
+      const labels = [];
+      const dataY = [];
+      const envUpper = [];
+      const envLower = [];
+
+      function calcStandardC(t) {
+        if (t <= 0) return 0;
+        if (Math.abs(zeta) < 1e-4) {
+          return 1 - Math.cos(wn * t);
+        } else if (zeta < 1.0) {
+          const wd = wn * Math.sqrt(1 - zeta * zeta);
+          const expTerm = Math.exp(-zeta * wn * t);
+          return 1 - expTerm * (Math.cos(wd * t) + (zeta / Math.sqrt(1 - zeta * zeta)) * Math.sin(wd * t));
+        } else if (Math.abs(zeta - 1.0) < 1e-4) {
+          return 1 - (1 + wn * t) * Math.exp(-wn * t);
+        } else {
+          const sq = Math.sqrt(zeta * zeta - 1);
+          const s1 = wn * (zeta - sq);
+          const s2 = wn * (zeta + sq);
+          return 1 - (zeta + sq) / (2 * sq) * Math.exp(-s1 * t) + (zeta - sq) / (2 * sq) * Math.exp(-s2 * t);
+        }
+      }
+
+      let maxY = 0;
+      let peakT = 0;
+      for (let i = 0; i <= N; i++) {
+        const t = i * dt;
+        labels.push(t.toFixed(2));
+        const cNow = calcStandardC(t);
+        const cNext = calcStandardC(t + 1e-4);
+        const dc = (cNext - cNow) / 1e-4;
+        const y = (zeroVal !== 0) ? (cNow + dc / zeroVal) : cNow;
+        dataY.push(y);
+        if (y > maxY) {
+          maxY = y;
+          peakT = t;
+        }
+        if (zeta > 0 && zeta < 1) {
+          const env = 1 + (1 / Math.sqrt(1 - zeta * zeta)) * Math.exp(-zeta * wn * t);
+          envUpper.push(env);
+          envLower.push(2 - env);
+        } else {
+          envUpper.push(null);
+          envLower.push(null);
+        }
+      }
+
+      // Performance metrics
+      let typeText = '';
+      let polesText = '';
+      if (Math.abs(zeta) < 1e-4) {
+        typeText = '無阻尼 (Undamped, ζ = 0)';
+        polesText = `±j${wn.toFixed(2)}`;
+      } else if (zeta < 1.0) {
+        typeText = '欠阻尼 (Under-damped, 0 < ζ < 1)';
+        const sigma = (zeta * wn).toFixed(2);
+        const wd = (wn * Math.sqrt(1 - zeta * zeta)).toFixed(2);
+        polesText = `-${sigma} ± j${wd}`;
+      } else if (Math.abs(zeta - 1.0) < 1e-4) {
+        typeText = '臨界阻尼 (Critically damped, ζ = 1)';
+        polesText = `-${wn.toFixed(2)}, -${wn.toFixed(2)}`;
+      } else {
+        typeText = '過阻尼 (Over-damped, ζ > 1)';
+        const sq = Math.sqrt(zeta * zeta - 1);
+        const p1 = (-wn * (zeta - sq)).toFixed(2);
+        const p2 = (-wn * (zeta + sq)).toFixed(2);
+        polesText = `${p1}, ${p2}`;
+      }
+
+      document.getElementById('metric-damping-type').textContent = typeText;
+      document.getElementById('metric-poles').textContent = polesText;
+
+      const osPercent = Math.max(0, (maxY - 1) * 100);
+      document.getElementById('metric-os').textContent = (zeta === 0) ? '100% (持續振盪)' : `${osPercent.toFixed(1)}%`;
+      document.getElementById('metric-tp').textContent = (zeta < 1 && zeta >= 0) ? `${peakT.toFixed(2)} s` : '無峰值 (單調)';
+      document.getElementById('metric-ts').textContent = (zeta > 0 && zeta < 1) ? `${(4 / (zeta * wn)).toFixed(2)} s` : (zeta === 0 ? '∞' : `${(4.8 / (wn * (zeta - Math.sqrt(Math.max(0, zeta*zeta - 1)) || 1))).toFixed(2)} s`);
+
+      // Find 10% to 90% rise time numerically
+      let t10 = null, t90 = null;
+      for (let i = 0; i <= N; i++) {
+        if (t10 === null && dataY[i] >= 0.1) t10 = i * dt;
+        if (t90 === null && dataY[i] >= 0.9) t90 = i * dt;
+      }
+      document.getElementById('metric-tr').textContent = (t10 !== null && t90 !== null) ? `${(t90 - t10).toFixed(2)} s` : '-';
+
+      // Render Chart.js
+      const ctx = document.getElementById('step-chart').getContext('2d');
+      if (stepChartInstance) stepChartInstance.destroy();
+      stepChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: '步階響應 y(t)',
+              data: dataY,
+              borderColor: '#38bdf8',
+              backgroundColor: 'rgba(56, 189, 248, 0.1)',
+              borderWidth: 2.5,
+              pointRadius: 0,
+              tension: 0.2
+            },
+            {
+              label: '穩態參考值 r(t) = 1',
+              data: labels.map(() => 1.0),
+              borderColor: '#94a3b8',
+              borderDash: [6, 4],
+              borderWidth: 1.2,
+              pointRadius: 0
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 150 },
+          scales: {
+            x: { ticks: { color: '#94a3b8', maxTicksLimit: 13 }, grid: { color: '#1e293b' }, title: { display: true, text: 'Time (sec)', color: '#94a3b8' } },
+            y: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' }, suggestedMin: -0.2, suggestedMax: 1.8 }
+          },
+          plugins: {
+            legend: { labels: { color: '#e2e8f0' } }
+          }
+        }
+      });
+
+      // Draw s-plane pole-zero SVG
+      const pzSvg = document.getElementById('pole-zero-svg');
+      const originX = 145, originY = 90, scale = 14;
+      let pzMarks = '';
+      if (zeta <= 1.0) {
+        const px = originX - (zeta * wn) * scale;
+        const pyOff = (wn * Math.sqrt(1 - zeta * zeta)) * scale;
+        pzMarks += `
+          <line x1="${originX}" y1="${originY}" x2="${px}" y2="${originY - pyOff}" stroke="#fbbf24" stroke-dasharray="3 2" stroke-width="1.2" />
+          <text x="${px - 6}" y="${originY - pyOff - 6}" fill="#f43f5e" font-size="13" font-weight="bold">✕</text>
+          <text x="${px - 6}" y="${originY + pyOff + 10}" fill="#f43f5e" font-size="13" font-weight="bold">✕</text>`;
+      } else {
+        const sq = Math.sqrt(zeta * zeta - 1);
+        const p1x = Math.max(15, originX - wn * (zeta - sq) * scale);
+        const p2x = Math.max(15, originX - wn * (zeta + sq) * scale);
+        pzMarks += `
+          <text x="${p1x - 5}" y="${originY + 5}" fill="#f43f5e" font-size="13" font-weight="bold">✕</text>
+          <text x="${p2x - 5}" y="${originY + 5}" fill="#f43f5e" font-size="13" font-weight="bold">✕</text>`;
+      }
+      if (zeroVal !== 0) {
+        const zx = Math.min(205, Math.max(15, originX - zeroVal * scale));
+        pzMarks += `<circle cx="${zx}" cy="${originY}" r="5" fill="none" stroke="#22d3ee" stroke-width="2" />`;
+      }
+
+      pzSvg.innerHTML = `
+        <rect x="0" y="0" width="${originX}" height="180" fill="rgba(16, 185, 129, 0.06)" />
+        <line x1="10" y1="${originY}" x2="210" y2="${originY}" stroke="#475569" stroke-width="1.2" />
+        <line x1="${originX}" y1="10" x2="${originX}" y2="170" stroke="#475569" stroke-width="1.2" />
+        <text x="18" y="22" fill="#10b981" font-size="10">LHP (穩定區)</text>
+        <text x="${originX + 6}" y="22" fill="#f43f5e" font-size="10">RHP</text>
+        <text x="195" y="${originY - 5}" fill="#94a3b8" font-size="10">σ</text>
+        <text x="${originX + 5}" y="165" fill="#94a3b8" font-size="10">jω</text>
+        ${pzMarks}
+      `;
+    }
+
+    // ==================== LAB 2: ROUTH-HURWITZ CALCULATOR ====================
+    function calculateRouthTable() {
+      const rawCoeffs = [
+        parseFloat(document.getElementById('routh-a5').value) || 0,
+        parseFloat(document.getElementById('routh-a4').value) || 0,
+        parseFloat(document.getElementById('routh-a3').value) || 0,
+        parseFloat(document.getElementById('routh-a2').value) || 0,
+        parseFloat(document.getElementById('routh-a1').value) || 0,
+        parseFloat(document.getElementById('routh-a0').value) || 0
+      ];
+      // Trim leading zeros
+      let startIdx = 0;
+      while (startIdx < rawCoeffs.length - 1 && Math.abs(rawCoeffs[startIdx]) < 1e-9) {
+        startIdx++;
+      }
+      const coeffs = rawCoeffs.slice(startIdx);
+      const deg = coeffs.length - 1;
+
+      const cols = Math.ceil((deg + 1) / 2);
+      const table = [];
+      const rowNotes = [];
+
+      const row0 = [];
+      const row1 = [];
+      for (let c = 0; c < cols; c++) {
+        row0.push(coeffs[2 * c] !== undefined ? coeffs[2 * c] : 0);
+        row1.push(coeffs[2 * c + 1] !== undefined ? coeffs[2 * c + 1] : 0);
+      }
+      table.push({ power: `s^${deg}`, vals: row0, tag: '' });
+      if (deg >= 1) {
+        table.push({ power: `s^${deg - 1}`, vals: row1, tag: '' });
+      }
+
+      let hasZeroRow = false;
+      let hasEpsilonCase = false;
+
+      for (let r = 2; r <= deg; r++) {
+        const currentPower = deg - r;
+        const prev1 = table[r - 1].vals.slice();
+        const prev2 = table[r - 2].vals.slice();
+
+        // Check if entire previous row is zero
+        const allZero = prev1.every(v => Math.abs(v) < 1e-7);
+        if (allZero) {
+          hasZeroRow = true;
+          const auxPower = currentPower + 1;
+          // Differentiate auxiliary polynomial U(s) from prev2
+          for (let c = 0; c < cols; c++) {
+            const exp = auxPower - 2 * c;
+            prev1[c] = exp > 0 ? prev2[c] * exp : 0;
+          }
+          table[r - 1].vals = prev1.slice();
+          table[r - 1].tag = ' (全零列 → 由輔助多項式 U(s) 微分取代)';
+          rowNotes.push(`在 s^${currentPower} 列發生「整列全為 0（特殊情況二, pp. 25–26）」，代表系統含有偶次對稱因式 U(s)，已取上方列輔助多項式導數繼續完成表格。`);
+        } else if (Math.abs(prev1[0]) < 1e-7) {
+          hasEpsilonCase = true;
+          prev1[0] = 0.001; // epsilon = 0.001
+          table[r - 1].tag = ' (首項為 0 → 以 ε → 0+ 取代)';
+          rowNotes.push(`在 s^${currentPower + 1} 列發生「第一行元素為 0 但整列不全為 0（特殊情況一, p. 25）」，以極小正數 ε → 0+ 代入完成判別。`);
+        }
+
+        const newRow = [];
+        const pivot = prev1[0];
+        for (let c = 0; c < cols - 1; c++) {
+          const val = (pivot * prev2[c + 1] - prev2[0] * prev1[c + 1]) / pivot;
+          newRow.push(val);
+        }
+        newRow.push(0);
+        table.push({ power: `s^${currentPower}`, vals: newRow, tag: '' });
+      }
+
+      // Count sign changes in first column
+      let signChanges = 0;
+      let prevSign = Math.sign(table[0].vals[0]);
+      for (let r = 1; r < table.length; r++) {
+        const s = Math.sign(table[r].vals[0]);
+        if (s !== 0 && prevSign !== 0 && s !== prevSign) {
+          signChanges++;
+        }
+        if (s !== 0) prevSign = s;
+      }
+
+      // Render Table HTML
+      const tableEl = document.getElementById('routh-table-el');
+      let thHtml = `<tr class="bg-slate-900 border-b border-slate-800 text-slate-300"><th class="p-2.5">階次</th><th class="p-2.5 text-amber-300">第一行 (First Col)</th>`;
+      for (let c = 1; c < cols; c++) thHtml += `<th class="p-2.5">Col ${c + 1}</th>`;
+      thHtml += `<th class="p-2.5">備註</th></tr>`;
+
+      let trHtml = '';
+      table.forEach(row => {
+        const firstVal = row.vals[0];
+        const firstClass = firstVal > 0 ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold';
+        trHtml += `<tr class="border-b border-slate-800/80"><td class="p-2.5 font-bold text-indigo-300">${row.power}</td><td class="p-2.5 ${firstClass}">${firstVal.toFixed(3)}</td>`;
+        for (let c = 1; c < cols; c++) {
+          trHtml += `<td class="p-2.5 text-slate-300">${row.vals[c].toFixed(3)}</td>`;
+        }
+        trHtml += `<td class="p-2.5 text-amber-300 text-[11px]">${row.tag}</td></tr>`;
+      });
+      tableEl.innerHTML = thHtml + trHtml;
+
+      const verdictBox = document.getElementById('routh-verdict-box');
+      if (signChanges === 0 && !hasZeroRow) {
+        verdictBox.className = 'p-4 rounded-xl border bg-emerald-950/50 border-emerald-500/40 text-emerald-200 text-xs space-y-1';
+        verdictBox.innerHTML = `<div class="text-sm font-bold text-emerald-300">✅ 系統穩定 (BIBO Stable)</div><div>Routh 表第一行所有元素皆嚴格為正（0 次變號），所有閉迴路極點皆位於左半平面 (LHP)。</div>`;
+      } else if (signChanges === 0 && hasZeroRow) {
+        verdictBox.className = 'p-4 rounded-xl border bg-amber-950/50 border-amber-500/40 text-amber-200 text-xs space-y-1';
+        verdictBox.innerHTML = `<div class="text-sm font-bold text-amber-300">⚠️ 含虛軸對稱根（臨界穩定或因虛軸重根而不穩定）</div><div>發生全零列（輔助多項式 U(s) 含虛軸共軛根）。若如 p.25 Example 2 之 U(s)=(s²+1)² 具虛軸重根，系統為<strong>不穩定 (Unstable)</strong>；若為單純一對虛軸單根則為臨界穩定。</div>`;
+      } else {
+        verdictBox.className = 'p-4 rounded-xl border bg-rose-950/50 border-rose-500/40 text-rose-200 text-xs space-y-1';
+        verdictBox.innerHTML = `<div class="text-sm font-bold text-rose-300">❌ 系統不穩定 (Unstable) — 共有 ${signChanges} 個右半平面 (RHP) 極點</div><div>Routh 表第一行共發生 <strong>${signChanges} 次正負號改變</strong>，依據 Routh-Hurwitz 判據 (p. 25)，系統有 ${signChanges} 個極點落在右半平面。</div>`;
+      }
+
+      document.getElementById('routh-note').textContent = rowNotes.join(' ') || '標準 Routh 表計算完成，無特殊情況發生。';
+    }
+
+    // ==================== LAB 3: BODE PLOT SIMULATOR ====================
+    function updateBodeSimulation() {
+      const a = parseFloat(document.getElementById('bode-param-a').value);
+      const zeta = parseFloat(document.getElementById('bode-param-zeta').value);
+      document.getElementById('bode-val-a').textContent = a.toFixed(1);
+      document.getElementById('bode-val-zeta').textContent = zeta.toFixed(2);
+
+      const freqs = [];
+      const exactMag = [];
+      const asympMag = [];
+      const exactPhase = [];
+
+      // Log-spaced frequencies from 0.1 to 100 rad/s
+      for (let i = -10; i <= 20; i++) {
+        const w = Math.pow(10, i / 10);
+        freqs.push(w.toFixed(2));
+
+        if (currentBodeMode === 'p42') {
+          // G(s) = (s+3) / ((s+2)(s^2 + 2s + 25)) from Lecture p.42 Fig. 7-10
+          const numMag = Math.sqrt(w * w + 9);
+          const den1Mag = Math.sqrt(w * w + 4);
+          const den2Mag = Math.sqrt(Math.pow(25 - w * w, 2) + Math.pow(2 * w, 2));
+          const magDb = 20 * Math.log10(numMag / (den1Mag * den2Mag));
+          exactMag.push(magDb);
+
+          // Piecewise linear asymptote per Lecture p.42
+          let asym = 20 * Math.log10(3 / 50); // ~ -24.44 dB
+          if (w > 2) asym -= 20 * Math.log10(w / 2);
+          if (w > 3) asym += 20 * Math.log10(w / 3);
+          if (w > 5) asym -= 40 * Math.log10(w / 5);
+          asympMag.push(asym);
+
+          const phNum = Math.atan2(w, 3) * (180 / Math.PI);
+          const phDen1 = Math.atan2(w, 2) * (180 / Math.PI);
+          const phDen2 = Math.atan2(2 * w, 25 - w * w) * (180 / Math.PI);
+          exactPhase.push(phNum - phDen1 - phDen2);
+        } else if (currentBodeMode === 'rc') {
+          // G(s) = 1 / (s/a + 1) from Lecture p.40
+          const mag = 1 / Math.sqrt(1 + Math.pow(w / a, 2));
+          exactMag.push(20 * Math.log10(mag));
+          asympMag.push(w <= a ? 0 : -20 * Math.log10(w / a));
+          exactPhase.push(-Math.atan2(w / a, 1) * (180 / Math.PI));
+        } else {
+          // Second-order G(s) = 1 / (1 + 2*zeta*(s/a) + (s/a)^2) from Lecture p.42 Fig. 7-9
+          const u = w / a;
+          const mag = 1 / Math.sqrt(Math.pow(1 - u * u, 2) + Math.pow(2 * zeta * u, 2));
+          exactMag.push(20 * Math.log10(mag));
+          asympMag.push(w <= a ? 0 : -40 * Math.log10(w / a));
+          exactPhase.push(-Math.atan2(2 * zeta * u, 1 - u * u) * (180 / Math.PI));
+        }
+      }
+
+      const infoEl = document.getElementById('bode-info-card');
+      if (currentBodeMode === 'p42') {
+        infoEl.innerHTML = `
+          <div class="font-bold text-indigo-300">講義 p.42 Example (Fig. 7-10)</div>
+          <div>• <strong>三個轉折頻率</strong>：$\omega_1 = 2$ (極點)、$\omega_2 = 3$ (零點)、$\omega_3 = 5$ rad/s (二階極點)</div>
+          <div>• <strong>低頻水平線</strong>：$20\log(3/50) \approx -24.4\text{ dB}$</div>
+          <div>• <strong>高頻漸近斜率</strong>：$-20 + 20 - 40 = -40\text{ dB/decade}$</div>`;
+      } else if (currentBodeMode === 'rc') {
+        infoEl.innerHTML = `
+          <div class="font-bold text-cyan-300">講義 p.40 一階 RC 低通系統 (Fig. 7-6)</div>
+          <div>• <strong>轉折頻率 / -3dB 頻寬</strong>：$\omega_{BW} = a = ${a.toFixed(1)}\text{ rad/s}$</div>
+          <div>• <strong>轉折點真實值</strong>：$-3.01\text{ dB}$，相角恰好為 $-45^\circ$</div>
+          <div>• <strong>高頻漸近斜率</strong>：$-20\text{ dB/decade}$</div>`;
+      } else {
+        const peakCorr = (-20 * Math.log10(2 * zeta)).toFixed(1);
+        infoEl.innerHTML = `
+          <div class="font-bold text-emerald-300">講義 p.42 二階系統波德圖修正 (Fig. 7-9)</div>
+          <div>• <strong>自然頻率</strong>：$\omega_n = ${a.toFixed(1)}\text{ rad/s}$，阻尼比 $\zeta = ${zeta.toFixed(2)}$</div>
+          <div>• <strong>轉折處 ($\omega=\omega_n$) 與漸近線差距</strong>：${peakCorr} dB，相角恆為 $-90^\circ$</div>
+          <div>• <strong>高頻漸近斜率</strong>：$-40\text{ dB/decade}$，最終相角趨近 $-180^\circ$</div>`;
+      }
+
+      const magCtx = document.getElementById('bode-mag-chart').getContext('2d');
+      if (bodeMagChartInstance) bodeMagChartInstance.destroy();
+      bodeMagChartInstance = new Chart(magCtx, {
+        type: 'line',
+        data: {
+          labels: freqs,
+          datasets: [
+            { label: '實際大小曲線 20log|G(jω)| (dB)', data: exactMag, borderColor: '#38bdf8', borderWidth: 2.4, pointRadius: 0, tension: 0.25 },
+            { label: '直線漸近線 (Asymptote)', data: asympMag, borderColor: '#f59e0b', borderDash: [5, 4], borderWidth: 1.8, pointRadius: 0, tension: 0 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 150 },
+          scales: {
+            x: { ticks: { color: '#94a3b8', maxTicksLimit: 10 }, grid: { color: '#1e293b' }, title: { display: true, text: 'Frequency ω (rad/s, log scale)', color: '#94a3b8' } },
+            y: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' }, title: { display: true, text: 'Magnitude (dB)', color: '#94a3b8' } }
+          },
+          plugins: { legend: { labels: { color: '#e2e8f0' } } }
+        }
+      });
+
+      const phaseCtx = document.getElementById('bode-phase-chart').getContext('2d');
+      if (bodePhaseChartInstance) bodePhaseChartInstance.destroy();
+      bodePhaseChartInstance = new Chart(phaseCtx, {
+        type: 'line',
+        data: {
+          labels: freqs,
+          datasets: [
+            { label: '實際相角 ∠G(jω) (deg)', data: exactPhase, borderColor: '#a855f7', borderWidth: 2.4, pointRadius: 0, tension: 0.25 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 150 },
+          scales: {
+            x: { ticks: { color: '#94a3b8', maxTicksLimit: 10 }, grid: { color: '#1e293b' }, title: { display: true, text: 'Frequency ω (rad/s, log scale)', color: '#94a3b8' } },
+            y: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' }, title: { display: true, text: 'Phase (degrees)', color: '#94a3b8' } }
+          },
+          plugins: { legend: { labels: { color: '#e2e8f0' } } }
+        }
+      });
+    }
+
+    // ==================== SCHEMA / INDEX / LOG / SUBMISSION VIEWER ====================
+    function renderSchemaView(docType) {
+      currentSchemaDoc = docType;
+      const container = document.getElementById('schema-rendered-content');
+      let md = '';
+      if (docType === 'agents') md = WIKI_DATA.agents_md;
+      else if (docType === 'index') md = WIKI_DATA.index_md;
+      else if (docType === 'log') md = WIKI_DATA.log_md;
+      else md = WIKI_DATA.submission_md;
+
+      container.innerHTML = renderWikiMarkdown(md);
+      triggerKaTeX(container);
+      bindWikiLinks(container);
+    }
+
+    // ==================== TAB SWITCHING & EVENT LISTENERS ====================
+    function switchMainTab(tabName) {
+      currentTab = tabName;
+      ['wiki', 'graph', 'lab', 'schema'].forEach(t => {
+        const viewEl = document.getElementById(`view-${t}`);
+        const btnEl = document.getElementById(`tab-btn-${t}`);
+        if (t === tabName) {
+          viewEl.classList.remove('hidden');
+          btnEl.className = 'main-tab-btn px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all bg-indigo-600 text-white shadow';
+        } else {
+          viewEl.classList.add('hidden');
+          btnEl.className = 'main-tab-btn px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-300 hover:text-white hover:bg-slate-800';
+        }
+      });
+
+      if (tabName === 'graph') {
+        renderKnowledgeGraph(currentPageId);
+      } else if (tabName === 'lab') {
+        updateStepSimulation();
+        calculateRouthTable();
+        updateBodeSimulation();
+      } else if (tabName === 'schema') {
+        renderSchemaView(currentSchemaDoc);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initGraphPositions();
+      selectWikiPage('ch01-introduction');
+
+      // Main tabs
+      document.querySelectorAll('.main-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => switchMainTab(btn.getAttribute('data-tab')));
+      });
+
+      // Wiki search & category filter
+      document.getElementById('wiki-search').addEventListener('input', (e) => {
+        currentSearch = e.target.value;
+        renderSidebar();
+      });
+
+      document.querySelectorAll('.wiki-filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentFilter = btn.getAttribute('data-filter');
+          document.querySelectorAll('.wiki-filter-btn').forEach(b => {
+            b.className = 'wiki-filter-btn px-2 py-1.5 rounded-lg text-xs font-medium bg-slate-800 text-slate-300 hover:bg-slate-700';
+          });
+          btn.className = 'wiki-filter-btn px-2 py-1.5 rounded-lg text-xs font-medium bg-indigo-600 text-white';
+          renderSidebar();
+        });
+      });
+
+      // Quick jump buttons in right sidebar
+      document.getElementById('btn-jump-graph').addEventListener('click', () => switchMainTab('graph'));
+      document.getElementById('btn-jump-lab').addEventListener('click', () => switchMainTab('lab'));
+
+      // Graph view buttons
+      document.getElementById('graph-reset-btn').addEventListener('click', () => {
+        renderKnowledgeGraph('ch01-introduction');
+      });
+      document.getElementById('graph-open-page-btn').addEventListener('click', () => {
+        switchMainTab('wiki');
+        selectWikiPage(currentPageId);
+      });
+
+      // Lab sub-tabs
+      document.querySelectorAll('.lab-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const target = btn.getAttribute('data-lab');
+          ['step', 'routh', 'bode'].forEach(k => {
+            document.getElementById(`lab-panel-${k}`).classList.toggle('hidden', k !== target);
+          });
+          document.querySelectorAll('.lab-tab-btn').forEach(b => {
+            b.className = 'lab-tab-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700';
+          });
+          btn.className = 'lab-tab-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-600 text-white';
+          if (target === 'step') updateStepSimulation();
+          if (target === 'routh') calculateRouthTable();
+          if (target === 'bode') updateBodeSimulation();
+        });
+      });
+
+      // Step response controls
+      ['slider-zeta', 'slider-wn', 'select-zero'].forEach(id => {
+        document.getElementById(id).addEventListener('input', updateStepSimulation);
+        document.getElementById(id).addEventListener('change', updateStepSimulation);
+      });
+      document.querySelectorAll('.step-preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.getElementById('slider-zeta').value = btn.getAttribute('data-zeta');
+          document.getElementById('slider-wn').value = btn.getAttribute('data-wn');
+          document.getElementById('select-zero').value = btn.getAttribute('data-zero');
+          updateStepSimulation();
+        });
+      });
+
+      // Routh controls
+      document.getElementById('btn-calc-routh').addEventListener('click', calculateRouthTable);
+      document.querySelectorAll('.routh-preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const parts = btn.getAttribute('data-coeffs').split(',');
+          ['a5', 'a4', 'a3', 'a2', 'a1', 'a0'].forEach((k, idx) => {
+            document.getElementById(`routh-${k}`).value = parts[idx];
+          });
+          calculateRouthTable();
+        });
+      });
+
+      // Bode controls
+      ['bode-param-a', 'bode-param-zeta'].forEach(id => {
+        document.getElementById(id).addEventListener('input', updateBodeSimulation);
+      });
+      document.querySelectorAll('.bode-preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentBodeMode = btn.getAttribute('data-bode');
+          document.querySelectorAll('.bode-preset-btn').forEach(b => {
+            b.className = 'bode-preset-btn w-full px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-left text-slate-200';
+          });
+          btn.className = 'bode-preset-btn w-full px-3 py-2.5 rounded-xl bg-indigo-600/30 border border-indigo-500/50 text-xs text-left text-white';
+          updateBodeSimulation();
+        });
+      });
+
+      // Schema sub-tabs
+      document.querySelectorAll('.schema-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const doc = btn.getAttribute('data-schema');
+          document.querySelectorAll('.schema-tab-btn').forEach(b => {
+            b.className = 'schema-tab-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700';
+          });
+          btn.className = 'schema-tab-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-600 text-white';
+          renderSchemaView(doc);
+        });
+      });
+
+      // Copy schema button
+      document.getElementById('btn-copy-schema').addEventListener('click', () => {
+        let rawText = WIKI_DATA.agents_md;
+        if (currentSchemaDoc === 'index') rawText = WIKI_DATA.index_md;
+        else if (currentSchemaDoc === 'log') rawText = WIKI_DATA.log_md;
+        else if (currentSchemaDoc === 'submit') rawText = WIKI_DATA.submission_md;
+
+        const ta = document.createElement('textarea');
+        ta.value = rawText;
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand('copy');
+          showToast('已複製 Markdown 原文到剪貼簿！');
+        } catch (err) {
+          showToast('複製失敗，請手動選取複製');
+        }
+        document.body.removeChild(ta);
+      });
+    });
+  </script>
+</body>
+</html>
